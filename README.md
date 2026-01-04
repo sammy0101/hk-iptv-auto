@@ -1,6 +1,7 @@
 # 📺 HK IPTV Auto Updater | 香港電視台直播源自動更新
 
-![Update Status](https://github.com/<你的用戶名>/<倉庫名稱>/actions/workflows/main.yml/badge.svg)
+![Update Status](https://github.com/sammy0101/hk-iptv-auto
+/actions/workflows/main.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 這是一個基於 **GitHub Actions** 的自動化 IPTV 聚合項目。
