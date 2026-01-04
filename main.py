@@ -6,7 +6,7 @@ from opencc import OpenCC
 # 初始化繁簡轉換器
 cc = OpenCC('s2t')
 
-# --- 設定區 (已更新你提供的來源與過濾設定) ---
+# --- 設定區 ---
 
 # 1. 來源列表
 SOURCE_URLS = [
@@ -23,16 +23,34 @@ SOURCE_URLS = [
     "https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.m3u"
 ]
 
-# 2. 關鍵字過濾 (已移除鳳凰)
+# 2. 包含關鍵字 (必須包含這些字才抓取)
 KEYWORDS = [
     "ViuTV", "HOY", "RTHK", "Jade", "Pearl", "J2", "J5", "Now", 
     "无线", "無線", "有线", "有線", "翡翠", "明珠", "港台", 
+    "电视", "電視", "高清", "News"
 ]
 
-# 3. 必備的官方/穩定源
+# 3. 【新增】黑名單關鍵字 (包含這些字的一律丟棄)
+BLOCK_KEYWORDS = [
+    "FOX", "Pluto", "Chopper", "Wow", "UHD", "8K", # 排除國外誤判頻道
+    "華麗", "星河", "鳳凰", "凤凰", "CCTV", "CGTN", # 排除非香港本地/特定排除台
+    "珠江", "廣東", "大灣區", "延时", "測試"
+]
+
+# 4. 【新增】頻道排序優先級 (越上面越靠前)
+ORDER_KEYWORDS = [
+    "翡翠", "無線新聞", "明珠", "J2", "J5", "財經",  # TVB系列
+    "ViuTV", "ViuTV 6", "ViuTVsix",               # Viu系列
+    "HOY", "奇妙", "有線",                         # HOY/Cable系列
+    "港台電視31", "RTHK 31",                      # RTHK系列
+    "港台電視32", "RTHK 32",
+    "Now新聞", "Now直播"                          # Now系列
+]
+
+# 5. 必備的官方/穩定源
 STATIC_CHANNELS = [
-    {"name": "RTHK 31", "url": "https://rthklive1-lh.akamaihd.net/i/rthk31_1@167495/index_2052_av-b.m3u8"},
-    {"name": "RTHK 32", "url": "https://rthklive2-lh.akamaihd.net/i/rthk32_1@168450/index_2052_av-b.m3u8"}
+    {"name": "港台電視31 (官方)", "url": "https://rthklive1-lh.akamaihd.net/i/rthk31_1@167495/index_2052_av-b.m3u8"},
+    {"name": "港台電視32 (官方)", "url": "https://rthklive2-lh.akamaihd.net/i/rthk32_1@168450/index_2052_av-b.m3u8"}
 ]
 
 # --- 邏輯區 ---
@@ -45,18 +63,26 @@ def check_url(url):
     except:
         return False
 
+def get_sort_key(item):
+    """計算頻道的排序權重"""
+    name = item["name"]
+    # 遍歷排序關鍵字，找到匹配的就返回索引值 (越小越前面)
+    for index, keyword in enumerate(ORDER_KEYWORDS):
+        if keyword in name:
+            return index
+    # 如果都沒匹配到，排在最後 (999)
+    return 999
+
 def fetch_and_parse():
     found_channels = []
     
-    # flush=True 確保在 GitHub Action 中能即時看到輸出
     print("🚀 任務開始！正在抓取網路源...", flush=True)
     
     for index, source in enumerate(SOURCE_URLS):
         print(f"  [{index+1}/{len(SOURCE_URLS)}] 正在讀取: {source}", flush=True)
         try:
-            # 設定 15 秒超時，避免大文件卡住
             r = requests.get(source, timeout=15)
-            r.encoding = 'utf-8' # 強制編碼，防止亂碼
+            r.encoding = 'utf-8'
             
             if r.status_code != 200:
                 print(f"    ⚠️ 無法讀取 (Status: {r.status_code})", flush=True)
@@ -71,19 +97,21 @@ def fetch_and_parse():
                 if not line: continue
                 
                 if line.startswith("#EXTINF"):
-                    # 提取頻道名稱
                     match = re.search(r',(.+)$', line)
                     if match:
                         raw_name = match.group(1).strip()
-                        
-                        # 1. 轉繁體
+                        # 轉繁體
                         converted_name = cc.convert(raw_name)
-                        
-                        # 2. 修正「臺」為「台」
+                        # 修正「臺」為「台」
                         current_name = converted_name.replace('臺', '台')
                         
                 elif line.startswith("http") and current_name:
-                    # 檢查關鍵字 (統一轉小寫比對)
+                    # 1. 黑名單檢查 (只要包含黑名單關鍵字，直接跳過)
+                    if any(b.lower() in current_name.lower() for b in BLOCK_KEYWORDS):
+                        current_name = ""
+                        continue
+
+                    # 2. 白名單檢查
                     if any(cc.convert(k).replace('臺', '台').lower() in current_name.lower() for k in KEYWORDS):
                         # 去重
                         if not any(c['url'] == line for c in found_channels):
@@ -110,7 +138,6 @@ def generate_m3u(channels):
         
     # 2. 檢測網路源
     for i, ch in enumerate(channels):
-        # 顯示進度 [1/100]
         print(f"[{i+1}/{total}] 檢測: {ch['name']} ...", end=" ", flush=True)
         
         if check_url(ch['url']):
@@ -119,7 +146,11 @@ def generate_m3u(channels):
         else:
             print("🔴 失效", flush=True)
 
-    # 3. 寫入文件
+    # 3. 【排序】根據自定義順序排列
+    print("\n🔄 正在進行排序...", flush=True)
+    final_list.sort(key=get_sort_key)
+
+    # 4. 寫入文件
     content = '#EXTM3U x-tvg-url="https://epg.112114.xyz/pp.xml"\n'
     content += f'# Update: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n'
     
