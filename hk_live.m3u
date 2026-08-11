@@ -1,5 +1,5 @@
 #EXTM3U x-tvg-url="https://epg.112114.xyz/pp.xml"
-# Update: 2026-08-10 13:11:09
+# Update: 2026-08-11 01:49:40
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
 http://php.jdshipin.com:8880/TVOD/iptv.php?id=fct
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台北美版.png",翡翠台北美版
@@ -26,10 +26,6 @@ http://php.jdshipin.com/TVOD/iptv.php?id=fct3
 http://php.jdshipin.com:8880/TVOD/iptv.php?id=fct3
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
 http://php.jdshipin.com:8880/TVOD/iptv.php?id=fct4
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
-http://120.198.86.186:9901/tsfile/live/1007_1.m3u8?key=txiptv&playlive=1&authid=0$LR•IPV4『线路1』
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
-http://120.237.39.10:9901/tsfile/live/1004_1.m3u8?key=txiptv&playlive=1&down=1$LR•IPV4『线路2』
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/TVB無線新聞.png",TVB無線新聞
 http://122.152.202.33/s/81a8a44f/index.m3u8?id=21
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/無線新聞.png",無線新聞
@@ -46,8 +42,6 @@ http://r.jdshipin.com/ZQ4kN
 http://r.jdshipin.com/jUx8K
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/明珠台.png",明珠台
 http://php.jdshipin.com/TVOD/iptv.php?id=mzt2
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/明珠台.png",明珠台
-http://120.198.86.186:9901/tsfile/live/1009_1.m3u8?key=txiptv&playlive=1&authid=0$LR•IPV4
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/有線財經信息台.png",有線財經信息台
 https://epg.pw/stream/0fddc0600d3868b05ad741d46294410aebca0fdc4fada5028dc54e624b7b17ca.m3u8
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/ViuTV.png",ViuTV
@@ -90,6 +84,14 @@ https://rthklive2-lh.akamaihd.net/i/rthk32_1@168450/index_2052_av-b.m3u8
 http://php.jdshipin.com/TVOD/iptv.php?id=rthk32
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK 32.png",RTHK 32
 https://www.rthk.hk/feeds/dtt/rthktv32_https.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK31.png",RTHK31
+http://rthklive1-lh.akamaihd.net/i/rthk31_1@167495/index_810_av-b.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK31.png",RTHK31
+http://rthklive1-lh.akamaihd.net/i/rthk31_1@167495/index_2052_av-b.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK31.png",RTHK31
+https://rthktv31-live.akamaized.net/hls/live/2036818/RTHKTV31/master.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK31.png",RTHK31
+https://rthklive1-lh.akamaihd.net/i/rthk31_1@167495/master.m3u8
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/MS NOW.png",MS NOW
 http://40.160.24.53/MSNBC/index.m3u8
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/無線 TVB Plus.png",無線 TVB Plus
