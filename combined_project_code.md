@@ -1,5 +1,5 @@
 # Complete Project Codebase
-Generated on: Fri Sep  4 15:06:07 UTC 2026
+Generated on: Fri Sep  4 15:15:50 UTC 2026
 
 ## File: requirements.txt
 ````txt
@@ -453,30 +453,29 @@ if __name__ == "__main__":
 ![Update Status](https://github.com/sammy0101/hk-iptv-auto/actions/workflows/main.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-這是一個基於 **GitHub Actions** 的自動化 IPTV 聚合項目。
-它每天定時從網路上抓取公開的直播源，自動過濾、檢測有效性、進行繁簡轉換與名稱修正，最終生成一份乾淨、可用的香港電視頻道列表 (`.m3u`)。
+這是一個基於 **GitHub Actions** 的全自動化香港電視 IPTV 聚合專案。
+每天定時自動同步上游最新資源庫與 TVBox 影視倉，進行深度切片級流媒體驗證、繁簡轉換（標準化為港式「台」字）與自動排序，生成純淨、可用的香港電視直播清單 (`.m3u`)。
 
 ---
 
 ## 🚀 訂閱地址 (Subscription URL)
 
-請在您的播放器 (TiviMate, TVBox, Kodi, PotPlayer 等) 中輸入以下鏈接：
+請在您的播放器 (TiviMate, TVBox, Kodi, PotPlayer, APTV 等) 中輸入以下鏈接：
 
 | 線路 | 鏈接 (URL) | 推薦度 |
 | :--- | :--- | :--- |
-| **CDN 加速 (推薦)** | `https://raw.gh.registry.cyou/sammy0101/hk-iptv-auto/refs/heads/main/hk_live.m3u` | ⭐⭐⭐⭐⭐ |
+| **jsDelivr CDN (推薦)** | `https://cdn.jsdelivr.net/gh/sammy0101/hk-iptv-auto@main/hk_live.m3u` | ⭐⭐⭐⭐⭐ |
 | **GitHub Raw** | `https://raw.githubusercontent.com/sammy0101/hk-iptv-auto/refs/heads/main/hk_live.m3u` | ⭐⭐⭐ |
 
-> ⚡ **CDN 加速服務由 [cmliussss](https://blog.cmliussss.com/) 提供，特此感謝！**
-> 
-> 💡 **提示**：推薦使用上方 **CDN 加速** 鏈接，在部分網路環境下更新速度會更快、更穩定。
+> 💡 **提示**：推薦使用上方 **jsDelivr CDN** 鏈接，自帶全球節點緩存加速，更新速度快且不受 GitHub 網絡波動影響。
 
 ---
 
 ## ❤️ 特別鳴謝 (Credits)
 
-本項目的數據來源主要基於以下開源項目與維護者的大力奉獻，在此致以最誠摯的謝意：
+本項目的數據來源主要基於以下開源項目與社區大佬的大力奉獻，在此致以最誠摯的謝意：
 
+*   **youhunwl**: [TVAPP](https://github.com/youhunwl/TVAPP) *(本專案已實現每日自動同步其最新在線源與影視倉)*
 *   **imDazui**: [Tvlist-awesome-m3u-m3u8](https://github.com/imDazui/Tvlist-awesome-m3u-m3u8)
 *   **fanmingming**: [live](https://github.com/fanmingming/live)
 *   **Guovin**: [TV](https://github.com/Guovin/TV)
@@ -490,29 +489,33 @@ if __name__ == "__main__":
 *   **MercuryZz**: [IPTVN](https://github.com/MercuryZz/IPTVN)
 *   **vbskycn**: [iptv](https://github.com/vbskycn/iptv)
 *   **suxuang**: [myIPTV](https://github.com/suxuang/myIPTV)
-*   **Free-TV**, **epg.pw** 以及所有無私維護直播源的開發者們。
+*   **Free-TV**, **epg.pw**, **jsDelivr** 以及所有無私維護直播源的開發者們。
 
 ---
 
 ## 📺 收錄頻道 (Supported Channels)
 
-本項目專注於香港本地頻道，並根據習慣進行了排序：
+本項目專注於香港本地頻道，並按照香港觀眾收視習慣進行了優先級排序：
 
-1.  **TVB 系列**: 翡翠台 (Jade), 明珠台 (Pearl), 無線新聞台 (News), J2, 財經體育資訊台
+1.  **TVB 系列**: 翡翠台 (Jade), 無綫新聞台 (News), 明珠台 (Pearl), TVB Plus (J2), 無綫財經體育資訊台
 2.  **ViuTV 系列**: ViuTV (99台), ViuTVsix (96台)
-3.  **HOY TV 系列**: HOY TV (77台), HOY 資訊台 (78台), 76台
-4.  **RTHK 系列**: 港台電視 31, 32, 33
+3.  **HOY TV 系列**: HOY TV (77台), HOY 資訊台 (78台)
+4.  **RTHK 系列**: 港台電視 31, 港台電視 32, 港台電視 33
 5.  **Now TV 系列**: Now 新聞台, Now 直播台
+6.  **其他資訊**: 有線新聞、有線財經等
 
 ---
 
 ## ✨ 項目特點 (Features)
 
-*   **🤖 全自動維護**: 利用 GitHub Actions 每天定時抓取最新源。
-*   **🔍 智能過濾**: 白名單保留香港頻道，黑名單攔截無效內容。
-*   **✅ 有效性檢測**: 自動測試直播源連接，剔除失效鏈接。
-*   **📝 名稱標準化**: 集成 `OpenCC` 繁簡轉換，並統一修正「台」字。
-*   **🔄 智能排序**: 依照香港觀眾習慣自動排列頻道順序。
+*   **🌐 動態上游同步**: 每日自動抓取 `youhunwl/TVAPP` 的最新數據庫，自動解碼 TVBox 單倉與多倉直播節點。
+*   **🔍 雙重過濾系統**:
+    *   **白名單機制**: 嚴格限定香港電視台專屬標籤，徹底過濾無關省份、體育、輪播台。
+    *   **黑名單攔截**: 強力剔除土耳其 NOW TV、以色列頻道、虎牙、斗魚、B站等雜訊。
+*   **⚡ 切片級深度檢測**: 深入解析 `.m3u8` 二級分片並驗證真實視頻二進位流，拒絕「假 200」黑屏死鏈。
+*   **🛡️ 官方源保底放行**: 內建香港電台與有線官方 Akamai/CDN 直連放行邏輯，防止 GitHub 海外機房誤殺香港本地可播源。
+*   **📝 文字標準化**: 集成 `OpenCC` 簡體轉繁體，並全面校正為港式「台」字。
+*   **🔄 自動排序**: 依照香港電視台順序自動排列，方便電視盒子開箱即用。
 
 ---
 
@@ -521,7 +524,7 @@ if __name__ == "__main__":
 如果你 Fork 了本項目，並希望自定義抓取來源或過濾邏輯，請參考以下步驟：
 
 ### 1. 增加/刪除直播源 (Sources)
-直接編輯 `main.py`，找到 `SOURCE_URLS` 列表。你可以加入任何公開的 `.m3u` 或 `.m3u8` 鏈接。
+直接編輯 `main.py`，找到 `FALLBACK_STANDARD_SOURCES` 列表。你可以加入任何公開的 `.m3u` 或 `.m3u8` 鏈接。
 
 ### 2. 修改過濾規則 (Filters)
 *   **白名單 (`KEYWORDS`)**: 頻道名稱**必須包含**這些關鍵字才會被抓取。
@@ -532,10 +535,10 @@ if __name__ == "__main__":
 
 ### 4. 修改訂閱鏈接 (Update Subscription URL)
 Fork 之後，`README.md` 顯示的訂閱鏈接仍然指向原作者 (`sammy0101`) 的倉庫。
-請務必編輯 `README.md`，將訂閱鏈接中的 `sammy0101` 替換為你的 GitHub 用戶名，否則你的用戶將無法獲取你更新的列表。
+請務必編輯 `README.md`，將訂閱鏈接中的 `sammy0101` 替換為你的 GitHub 用戶名：
 
-*   **CDN 格式範例**:
-    `https://raw.gh.registry.cyou/<你的用戶名>/<倉庫名稱>/refs/heads/main/hk_live.m3u`
+*   **jsDelivr 格式範例**:
+    `https://cdn.jsdelivr.net/gh/<你的用戶名>/<倉庫名稱>@main/hk_live.m3u`
 
 ### ⚠️ 重要：Fork 後如何啟用自動更新
 Fork 本項目後，GitHub Actions 默認是關閉的。你需要：
@@ -547,10 +550,10 @@ Fork 本項目後，GitHub Actions 默認是關閉的。你需要：
 
 ## ⚠️ 免責聲明 (Disclaimer)
 
-1.  **僅供學習交流**: 本項目僅是一個技術研究項目。
-2.  **不存儲視頻**: 所有直播源鏈接均來自網際網路上的公開渠道，本倉庫不存儲任何視頻流文件。
-3.  **版權聲明**: 頻道版權歸相關電視台所有。
-4.  **地區限制**: 部分源可能僅限香港 IP 播放。
+1.  **僅供學習交流**: 本項目僅是一個網絡串流測試與自動化技術研究項目。
+2.  **不存儲視頻**: 所有直播源鏈接均來自網際網路上的公開渠道，本倉庫不存儲、不託管、不轉發任何視頻流文件。
+3.  **版權聲明**: 頻道版權歸相關電視台所有。若有權益問題請提 issue，我們將第一時間配合移除相關關鍵字。
+4.  **地區限制**: 部分源（如 RTHK、HOY TV 官方直連）設有 Geo-block，需使用香港本地網絡或香港網絡節點觀看。
 
 **Last Update:** 每天自動更新
 
@@ -559,53 +562,187 @@ Fork 本項目後，GitHub Actions 默認是關閉的。你需要：
 ## File: hk_live.m3u
 ````m3u
 #EXTM3U x-tvg-url="https://epg.112114.xyz/pp.xml"
-# Update: 2026-09-04 14:53:59
+# Update: 2026-09-04 15:09:46
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
-http://r.jdshipin.com/qrfbg
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
-http://r.jdshipin.com/GeWKr
+http://122.152.202.33/s/81a8a44f/index.m3u8?id=53
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/TVB翡翠台（備用）.png",TVB翡翠台（備用）
+http://php.jdshipin.com:8880/TVOD/iptv.php?id=fct
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
 http://r.jdshipin.com/qClQf
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
+http://r.jdshipin.com/GeWKr
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
+http://r.jdshipin.com/qrfbg
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
 http://r.jdshipin.com/n90gt
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/TVB翡翠台 4K.png",TVB翡翠台 4K
+http://php.jdshipin.com:8880/TVOD/iptv.php?id=fct4
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/TVB翡翠台 1080P.png",TVB翡翠台 1080P
+http://php.jdshipin.com:8880/TVOD/iptv.php?id=fct3
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台4K(字幕).png",翡翠台4K(字幕)
+https://cdn.qd.je/163189/fct4k
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台(字幕).png",翡翠台(字幕)
+https://cdn.qd.je/163189/fct2
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
+https://cdn.qd.je/163189/fct
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台(WebVTT字幕).png",翡翠台(WebVTT字幕)
+https://cdn.qd.je/163189/fctvtt
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台北美版.png",翡翠台北美版
+http://php.jdshipin.com:8880/TVOD/iptv.php?id=j1
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
+http://120.198.84.146:9901/tsfile/live/1020_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
+http://120.238.94.82:9901/tsfile/live/1007_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
+http://183.237.95.108:9901/tsfile/live/1076_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
+http://120.238.85.131:9901/tsfile/live/1005_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
+http://120.198.95.220:9901/tsfile/live/1004_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
+http://183.62.8.58:50085/tsfile/live/0017_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
+http://116.77.33.98:44330/tsfile/live/1008_1.m3u8?key=txiptv&playlive=0&authid=0
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
+http://120.198.95.220:9901/tsfile/live/1004_1.m3u8?key=txiptv&playlive=1&down=1
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
+http://120.196.235.42:9901/tsfile/live/1006_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
+https://cdn.qd.je/163189.php?id=fct
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/無線新聞.png",無線新聞
+https://h5cdn3.kylintv.tv/live/tvbnews_iphone.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/TVB無線新聞.png",TVB無線新聞
+http://122.152.202.33/s/81a8a44f/index.m3u8?id=21
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/無線新聞.png",無線新聞
 http://php.jdshipin.com/TVOD/iptv.php?id=wxxw
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/無線新聞.png",無線新聞
 http://r.jdshipin.com/CkuBd
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/無線新聞Pdtv.png",無線新聞Pdtv
+http://rihou.cc:555/tv/[Pd]无线新闻
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/無線新聞台.png",無線新聞台
+https://cdn.qd.je/163189/wxxw
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/無線新聞台.png",無線新聞台
+https://cdn.qd.je/163189/wxxwt
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/無線新聞.png",無線新聞
-https://h5cdn3.kylintv.tv/live/tvbnews_iphone.m3u8
+https://cdn.qd.je/163189.php?id=wxxw
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/TVB明珠台.png",TVB明珠台
+http://php.jdshipin.com/TVOD/iptv.php?id=mzt
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/明珠台(字幕).png",明珠台(字幕)
+https://cdn.qd.je/163189/mzt
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/明珠台.png",明珠台
+http://116.77.33.98:44330/tsfile/live/1009_1.m3u8?key=txiptv
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/明珠台.png",明珠台
+http://r.jdshipin.com/ZQ4kN
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/明珠台(WebVTT字幕).png",明珠台(WebVTT字幕)
+https://cdn.qd.je/163189/mztvtt
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/明珠台.png",明珠台
+http://php.jdshipin.com/TVOD/iptv.php?id=mzt2
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/明珠台.png",明珠台
+http://120.238.94.82:9901/tsfile/live/1008_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/明珠台.png",明珠台
+http://183.62.8.58:50085/tsfile/live/0018_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/明珠台.png",明珠台
+http://120.198.84.146:9901/tsfile/live/1054_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/明珠台.png",明珠台
+http://183.237.95.108:9901/tsfile/live/1009_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/明珠台.png",明珠台
+http://116.77.33.98:44330/tsfile/live/1009_1.m3u8?key=txiptv&playlive=0&authid=0
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/明珠台.png",明珠台
+https://cdn.qd.je/163189.php?id=mzt
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/TVB Plus(字幕).png",TVB Plus(字幕)
+https://cdn.qd.je/163189/tvbp
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/TVB Plus(WebVTT字幕).png",TVB Plus(WebVTT字幕)
+https://cdn.qd.je/163189/tvbpvtt
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/TVB Plus.png",TVB Plus
+http://php.jdshipin.com/TVOD/iptv.php?id=j2
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/TVB Plus.png",TVB Plus
+https://cdn.qd.je/163189.php?id=tvbp
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/「HK」J2.png",「HK」J2
+http://r.jdshipin.com/Nr5jq
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/HOY國際財經台.png",HOY國際財經台
+https://cdn.qd.je/163189/hoy76
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/Viutv.png",Viutv
 http://r.jdshipin.com/vSJvl
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/Viutv.png",Viutv
-http://php.jdshipin.com/TVOD/iptv.php?id=viutv
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/Viutv.png",Viutv
 http://r.jdshipin.com/TcKr2
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/Viutv.png",Viutv
+http://php.jdshipin.com/TVOD/iptv.php?id=viutv
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/Viutv.png",Viutv
 http://php.jdshipin.com/TVOD/iptv.php?id=viutv2
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/ViuTV.png",ViuTV
+https://cdn.qd.je/163189/viu
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/ViuTVsix.png",ViuTVsix
+https://cdn.qd.je/163189/viu6
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/VIUTV.png",VIUTV
+https://cdn.qd.je/163189.php?id=viu
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/VIUTV6.png",VIUTV6
+https://cdn.qd.je/163189.php?id=viu6
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/HOY TV.png",HOY TV
 http://uc6.i-cable.com/live_freedirect/opentvhd001_h.live/playlist.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/HOY TV.png",HOY TV
+https://cdn.qd.je/163189/hoy
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/HOY TV.png",HOY TV
+https://cdn.qd.je/163189/hoy2
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/HOY TV.png",HOY TV
+http://r.jdshipin.com/sFw4S
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/HOY TV.png",HOY TV
+http://php.jdshipin.com/TVOD/iptv.php?id=hoytv
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/HOY 資訊台.png",HOY 資訊台
 http://61.10.2.141/live_freedirect/freehd209_h.live/playlist.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/HOY資訊台.png",HOY資訊台
+https://cdn.qd.je/163189/hoy78
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/HOY77.png",HOY77
+https://cdn.qd.je/163189.php?id=hoy
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/HOY78.png",HOY78
+https://cdn.qd.je/163189.php?id=hoy78
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/HOY76.png",HOY76
+https://cdn.qd.je/163189.php?id=hoy76
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/有線新聞Pdtv.png",有線新聞Pdtv
+http://rihou.cc:555/tv/[Pd]有线新闻
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視31.png",港台電視31
 https://rthklive1-lh.akamaihd.net/i/rthk31_1@167495/index_2052_av-b.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 31 (港台電視31) (360p) [Geo-blocked].png",RTHK TV 31 (港台電視31) (360p) [Geo-blocked]
-https://rthklive1-lh.akamaihd.net/i/rthk31_1@167495/master.m3u8
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 31 (港台電視31) (1080p) [Geo-blocked].png",RTHK TV 31 (港台電視31) (1080p) [Geo-blocked]
 https://rthktv31-live.akamaized.net/hls/live/2036818/RTHKTV31/master.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視31.png",港台電視31
+http://php.jdshipin.com:8880/TVOD/iptv.php?id=rthk31
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK31.png",RTHK31
+https://cdn.qd.je/163189/rthk31
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視32.png",港台電視32
 https://rthklive2-lh.akamaihd.net/i/rthk32_1@168450/index_2052_av-b.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 32 (港台電視32) (360p) [Geo-blocked].png",RTHK TV 32 (港台電視32) (360p) [Geo-blocked]
-https://rthklive2-lh.akamaihd.net/i/rthk32_1@168450/master.m3u8
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 32 (港台電視32) (1080p) [Geo-blocked].png",RTHK TV 32 (港台電視32) (1080p) [Geo-blocked]
 https://rthktv32-live.akamaized.net/hls/live/2036819/RTHKTV32/master.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視32.png",港台電視32
+http://php.jdshipin.com:8880/TVOD/iptv.php?id=rthk32
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK32.png",RTHK32
+https://cdn.qd.je/163189/rthk32
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/Now新聞欣賞.png",Now新聞欣賞
+http://rihou.cc:555/tv/[Hk]Now新闻
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/NOW新聞台.png",NOW新聞台
+https://cdn.qd.je/163189/now
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/Now新聞Pdtv.png",Now新聞Pdtv
+http://rihou.cc:555/tv/[Pd]Now新闻
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/Now新聞欣賞.png",Now新聞欣賞
+http://rihou.cc:555/tv/[Cx]Now新闻
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/NOW新聞台.png",NOW新聞台
+https://cdn.qd.je/163189.php?id=now
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 33 (港台電視33) (1080p) [Geo-blocked].png",RTHK TV 33 (港台電視33) (1080p) [Geo-blocked]
 https://rthktv33-live.akamaized.net/hls/live/2101641/RTHKTV33/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 35 (港台電視35) (1080p) [Geo-blocked].png",RTHK TV 35 (港台電視35) (1080p) [Geo-blocked]
-https://rthktv35-live.akamaized.net/hls/live/2101643/RTHKTV35/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 36 (港台電視36) (1080p) [Geo-blocked].png",RTHK TV 36 (港台電視36) (1080p) [Geo-blocked]
-https://rthktv36-live.akamaized.net/hls/live/2112176/RTHKTV36/master.m3u8
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 34 (港台電視34) (1080p) [Geo-blocked].png",RTHK TV 34 (港台電視34) (1080p) [Geo-blocked]
 https://rthktv34-live.akamaized.net/hls/live/2101642/RTHKTV34/master.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 35 (港台電視35) (1080p) [Geo-blocked].png",RTHK TV 35 (港台電視35) (1080p) [Geo-blocked]
+https://rthktv35-live.akamaized.net/hls/live/2101643/RTHKTV35/master.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK-32Pdtv.png",RTHK-32Pdtv
+http://rihou.cc:555/tv/[Pd]RTHK-32
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK-31Pdtv.png",RTHK-31Pdtv
+http://rihou.cc:555/tv/[Pd]RTHK-31
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 36 (港台電視36) (1080p) [Geo-blocked].png",RTHK TV 36 (港台電視36) (1080p) [Geo-blocked]
+https://rthktv36-live.akamaized.net/hls/live/2112176/RTHKTV36/master.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK-32.png",RTHK-32
+https://cdn.qd.je/163189.php?id=rthk32
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK-31.png",RTHK-31
+https://cdn.qd.je/163189.php?id=rthk31
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK-33.png",RTHK-33
+https://cdn.qd.je/163189.php?id=rthk33
 
 ````
 
