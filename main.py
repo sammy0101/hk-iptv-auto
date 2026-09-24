@@ -11,7 +11,7 @@ import m3u8
 
 cc = OpenCC('s2t')
 
-# 模擬標準 Android TV 播放器標頭
+# 模擬標準 Android TV 播放器標頭 (穿透多數防盜鏈)
 IPTV_UA = 'okhttp/3.15.0 (Linux; Android 11; TVBox)'
 HEADERS = {
     'User-Agent': IPTV_UA,
@@ -19,7 +19,7 @@ HEADERS = {
     'Connection': 'keep-alive'
 }
 
-# --- 1. 唯一上游目標 (只從這兩個 README 動態爬取) ---
+# --- 1. 唯一上游目標 (只讀取這兩個 README.md，包含所有在線源、單倉、多倉) ---
 TARGET_README_URLS = [
     "https://raw.githubusercontent.com/youhunwl/TVAPP/main/README.md",
     "https://raw.githubusercontent.com/ngo5/IPTV/main/README.md"
@@ -61,11 +61,12 @@ OFFICIAL_CHANNELS = [
     {"name": "港台電視32", "url": "https://rthktv32-live.akamaized.net/hls/live/2036819/RTHKTV32/master.m3u8"}
 ]
 
-# --- 3. URL 編碼與解析模組 ---
+# --- 3. URL 規範化與編碼模組 ---
 
 def clean_and_encode_url(url: str) -> str:
-    """自動處理 Punycode 中文域名、中文路徑編碼及 GitHub Blob 直鏈轉換"""
-    url = url.strip()
+    """自動清理結尾雜訊、轉換 GitHub Blob 直鏈，並處理中文域名 Punycode"""
+    # 剔除 Markdown 括號、註釋符、引號與空格
+    url = url.strip().rstrip(')>],;\'"')
     if "github.com/" in url and "/blob/" in url:
         url = url.replace("github.com/", "raw.githubusercontent.com/").replace("/blob/", "/")
     try:
@@ -78,7 +79,6 @@ def clean_and_encode_url(url: str) -> str:
         return url
 
 def fetch_raw_content(url: str, timeout: int = 10) -> str:
-    """發起 HTTP 請求並自動獲取解碼文本"""
     safe_url = clean_and_encode_url(url)
     try:
         r = requests.get(safe_url, headers=HEADERS, timeout=timeout)
@@ -90,19 +90,16 @@ def fetch_raw_content(url: str, timeout: int = 10) -> str:
     return ""
 
 def parse_tvbox_payload(text: str) -> dict:
-    """自動識別並解析 TVBox 配置 (支援純 JSON 與 Base64 / PNG 偽裝)"""
+    """支援純 JSON 與 Base64 / PNG 偽裝密文"""
     text = text.strip()
     if not text:
         return {}
-    
-    # 嘗試直接解析 JSON
     try:
         if text.startswith('{') or text.startswith('['):
             return json.loads(text)
     except Exception:
         pass
 
-    # 嘗試 Base64 解碼 (處理 ** 開頭或 .png 偽裝文件)
     try:
         clean_b64 = re.sub(r'[^A-Za-z0-9+/=]', '', text)
         decoded = base64.b64decode(clean_b64).decode('utf-8', errors='ignore')
@@ -114,13 +111,18 @@ def parse_tvbox_payload(text: str) -> dict:
 
     return {}
 
-def extract_from_tvbox(target_url: str, visited: set = None, depth: int = 0) -> list:
+# --- 4. 萬能候選鏈接萃取器 (內容探針) ---
+
+def process_candidate_url(target_url: str, visited: set = None, depth: int = 0) -> list:
     """
-    遞迴提取 TVBox 單倉與多倉內的所有直播源 (lives)
+    通用探針：全自動識別目標網址是：
+    1. 直連 M3U / TXT 直播源（包括無後綴如 /zb、/dsy 等）
+    2. TVBox 單倉（提取 lives）
+    3. TVBox 多倉（遞迴展開 urls）
     """
     if visited is None:
         visited = set()
-    if depth > 3:  # 限制多倉遞迴深度，避免死循環
+    if depth > 3:
         return []
 
     safe_url = clean_and_encode_url(target_url)
@@ -128,85 +130,76 @@ def extract_from_tvbox(target_url: str, visited: set = None, depth: int = 0) -> 
         return []
     visited.add(safe_url)
 
-    extracted_live_urls = []
+    # 1. 如果副檔名已經明確是 M3U/TXT 且不是多倉清單，直接作為直播清單返回
+    lower_path = urlparse(safe_url).path.lower()
+    if any(lower_path.endswith(ext) for ext in ['.m3u', '.m3u8', '.txt']) and 'dc.txt' not in lower_path:
+        return [safe_url]
+
+    # 2. 發起探針請求確認內部真實格式
     text = fetch_raw_content(safe_url, timeout=8)
     if not text:
         return []
 
-    # 檢查是否本身就是直連 M3U/TXT 播放列表
-    if '#EXTM3U' in text or any(',' in l and 'http' in l for l in text.split('\n')[:10]):
+    # 2.1 內容本身就是 M3U 或 TXT 直播列表（例如游魂 /tv/zb、天神 /dsy）
+    first_few_lines = text.split('\n')[:15]
+    if '#EXTM3U' in text or any('#genre#' in l for l in first_few_lines) or any(',' in l and 'http' in l for l in first_few_lines):
         return [safe_url]
 
+    # 2.2 嘗試按 TVBox 單倉/多倉 JSON 處理
     data = parse_tvbox_payload(text)
     if not isinstance(data, dict):
         return []
 
-    # 1. 提取單倉 lives 節點
+    extracted_lives = []
+
+    # 提取單倉 lives 直播節點
     if 'lives' in data and isinstance(data['lives'], list):
         for item in data['lives']:
             if isinstance(item, dict):
                 l_url = item.get('url')
                 if l_url and isinstance(l_url, str) and l_url.startswith('http'):
-                    extracted_live_urls.append(clean_and_encode_url(l_url))
+                    extracted_lives.append(clean_and_encode_url(l_url))
                 elif 'channels' in item and isinstance(item['channels'], list):
                     for sub in item['channels']:
                         for u in sub.get('urls', []):
                             if isinstance(u, str) and u.startswith('http'):
-                                extracted_live_urls.append(clean_and_encode_url(u))
+                                extracted_lives.append(clean_and_encode_url(u))
 
-    # 2. 遞迴提取多倉 urls 節點
+    # 提取多倉 urls 節點並遞迴
     if 'urls' in data and isinstance(data['urls'], list):
         for sub_item in data['urls']:
             if isinstance(sub_item, dict) and 'url' in sub_item:
                 sub_url = sub_item['url']
                 if isinstance(sub_url, str) and sub_url.startswith('http'):
-                    extracted_live_urls.extend(extract_from_tvbox(sub_url, visited, depth + 1))
+                    extracted_lives.extend(process_candidate_url(sub_url, visited, depth + 1))
 
-    return list(set(extracted_live_urls))
-
-# --- 4. 動態解析兩個目標 README.md ---
+    return list(set(extracted_lives))
 
 def extract_all_sources_from_readmes() -> list:
-    """
-    從兩個目標 README.md 中萃取所有單倉、多倉與直連直播清單
-    """
-    print("🌐 開始動態抓取目標 README.md...", flush=True)
+    """全量讀取兩個目標 README.md，抓出包含推薦在線源、IPv4、IPv6、海外、單多倉在內的所有直播清單"""
+    print("🌐 開始解析目標 README.md 全文...", flush=True)
     all_extracted_playlists = set()
     candidate_urls = set()
 
     for readme_url in TARGET_README_URLS:
-        print(f"  -> 正在讀取: {readme_url}", flush=True)
+        print(f"  -> 抓取上游清單: {readme_url}", flush=True)
         content = fetch_raw_content(readme_url, timeout=12)
         if not content:
-            print(f"     ⚠️ 讀取失敗或內容為空: {readme_url}", flush=True)
             continue
 
-        # 正則匹配所有 http/https 鏈接 (自動過濾註釋與行尾文字)
-        found_urls = re.findall(r'https?://[^\s#<>"\']+', content)
-        for u in found_urls:
-            u = u.strip()
-            # 排除非源鏈接
-            if any(ext in u.lower() for ext in ['.apk', '.exe', '.zip', 'shields.io', 'github.com/youhunwl', 'github.com/ngo5']):
+        # 匹配所有有效的 http/https 鏈接 (精確去除 Markdown 雜訊)
+        raw_urls = re.findall(r'https?://[^\s#<>"\']+', content)
+        for u in raw_urls:
+            clean_u = u.strip().rstrip(')>],;\'"')
+            # 排除非流媒體非配置鏈接
+            if any(ext in clean_u.lower() for ext in ['.apk', '.exe', '.zip', 'shields.io', 'badge.svg', '.jpg', '.jpeg', '.gif', 'github.com/youhunwl/tvapp', 'github.com/ngo5/iptv']):
                 continue
-            candidate_urls.add(u)
+            candidate_urls.add(clean_u)
 
-    print(f"🔍 從 README 中獲取到 {len(candidate_urls)} 個候選接口，開始深入解析單倉/多倉與直播源...", flush=True)
-
-    # 並行解析所有候選接口
-    def process_candidate(url):
-        results = []
-        lower_url = url.lower()
-        # 明確的直連直播源副檔名
-        if any(lower_url.endswith(ext) for ext in ['.m3u', '.m3u8', '.txt']) and 'dc.txt' not in lower_url:
-            results.append(clean_and_encode_url(url))
-        else:
-            # 單倉、多倉接口 (JSON/Base64/無副檔名)
-            lives = extract_from_tvbox(url)
-            results.extend(lives)
-        return results
+    print(f"🔍 全文共掃描出 {len(candidate_urls)} 個候選網址，開始深入解碼與分類...", flush=True)
 
     with ThreadPoolExecutor(max_workers=15) as executor:
-        futures = [executor.submit(process_candidate, u) for u in candidate_urls]
+        futures = [executor.submit(process_candidate_url, u) for u in candidate_urls]
         for f in as_completed(futures):
             try:
                 res = f.result()
@@ -215,7 +208,7 @@ def extract_all_sources_from_readmes() -> list:
                 pass
 
     final_sources = list(all_extracted_playlists)
-    print(f"✅ 深度挖掘完成！共解析出 {len(final_sources)} 個有效直播源清單。", flush=True)
+    print(f"✅ 全部分析完畢！共獲取到 {len(final_sources)} 個可下載的直播源清單（含全部在線源與影視倉 lives）。", flush=True)
     return final_sources
 
 # --- 5. ffprobe 真機解碼級驗證 ---
@@ -267,7 +260,7 @@ def verify_single_channel(ch: dict) -> tuple:
     is_playable = check_stream_with_ffprobe(url, timeout=5)
     return ch, is_playable
 
-def check_channels_parallel(channels: list, max_workers: int = 10) -> list:
+def check_channels_parallel(channels: list, max_workers=10) -> list:
     valid_channels = []
     print(f"\n🔍 開始對 {len(channels)} 個候選源進行【ffprobe 真機解碼級驗證】...", flush=True)
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -288,17 +281,17 @@ def get_sort_key(item: dict) -> int:
             return index
     return 999
 
-# --- 6. 核心排程執行邏輯 ---
+# --- 6. 主流程執行 ---
 
 def fetch_and_parse() -> list:
     found_channels = []
     seen_urls = set()
 
-    # 1. 唯一來源：動態解析兩個目標 README.md
+    # 1. 唯一來源：解析兩個 README.md 中所有類型的網址
     playlist_sources = extract_all_sources_from_readmes()
-    print(f"🚀 開始逐一檢索各清單中的香港電視頻道...", flush=True)
+    print(f"🚀 開始檢索各清單中的香港電視頻道...", flush=True)
 
-    # 2. 下載並解析每個 M3U/TXT 列表
+    # 2. 逐一提取香港電視台並過濾
     for index, source in enumerate(playlist_sources):
         content = fetch_raw_content(source, timeout=8)
         if not content:
@@ -344,12 +337,11 @@ def fetch_and_parse() -> list:
                                     count_added += 1
 
         if count_added > 0:
-            print(f"  [{index+1}/{len(playlist_sources)}] 提取到 {count_added} 個香港候選頻道", flush=True)
+            print(f"  [{index+1}/{len(playlist_sources)}] 提取到 {count_added} 個香港候選頻道 (來源: {source})", flush=True)
 
     return found_channels
 
 def generate_m3u(channels: list):
-    # 進行真機解碼篩選
     tested_channels = check_channels_parallel(channels)
 
     final_dict = {}
