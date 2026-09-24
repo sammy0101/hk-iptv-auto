@@ -19,7 +19,6 @@ HEADERS = {
     'Connection': 'keep-alive'
 }
 
-# 檢測系統是否具備 ffprobe
 HAS_FFPROBE = shutil.which('ffprobe') is not None
 if not HAS_FFPROBE:
     print("⚠️ 警告: 系統環境未安裝 ffprobe，將自動切換為【Python 原生切片穿透驗證】", flush=True)
@@ -220,10 +219,9 @@ def extract_all_sources() -> list:
     print(f"✅ 共聚合出 {len(final_sources)} 個直播源清單。", flush=True)
     return final_sources
 
-# --- 5. 雙軌真流媒體穿透檢測器 ---
+# --- 5. 穿透檢測器 ---
 
 def check_hls_segments_python(url: str, timeout: int = 6) -> bool:
-    """純 Python 深度檢測：下載 m3u8，提取真實音視頻切片 (.ts/.m4s) 並驗證是否真有數據"""
     try:
         r = requests.get(url, headers=HEADERS, timeout=timeout, stream=True)
         if r.status_code != 200:
@@ -242,7 +240,6 @@ def check_hls_segments_python(url: str, timeout: int = 6) -> bool:
         parsed = m3u8.loads(text)
         target_seg_url = None
 
-        # 多碼率 Master Playlist
         if parsed.is_variant and parsed.playlists:
             sub_url = urljoin(url, parsed.playlists[0].uri)
             sub_r = requests.get(sub_url, headers=HEADERS, timeout=timeout)
@@ -265,7 +262,6 @@ def check_hls_segments_python(url: str, timeout: int = 6) -> bool:
     return False
 
 def check_stream_with_ffprobe(url: str, timeout: int = 6) -> bool:
-    """系統 ffprobe 工具真機解碼探測"""
     cmd = [
         'ffprobe',
         '-v', 'error',
@@ -287,16 +283,12 @@ def check_stream_with_ffprobe(url: str, timeout: int = 6) -> bool:
 
 def verify_single_channel(ch: dict) -> tuple:
     url = ch['url']
-    
-    # 官方 CDN 在海外必報 403，給予放行保護
     if any(d in url.lower() for d in ['rthk.hk', 'akamaized.net', 'akamaihd.net']):
         return ch, True
     
-    # 優先嘗試 ffprobe；若環境未安裝則降級為 Python 視頻切片測試
     if HAS_FFPROBE:
         is_alive = check_stream_with_ffprobe(url, timeout=6)
         if not is_alive:
-            # 容錯：部分反代源可能被 ffprobe 逾時誤殺，使用 Python 切片二次複查
             is_alive = check_hls_segments_python(url, timeout=6)
     else:
         is_alive = check_hls_segments_python(url, timeout=6)
@@ -324,7 +316,7 @@ def get_sort_key(item: dict) -> int:
             return index
     return 999
 
-# --- 6. 主流程執行 ---
+# --- 6. 主流程執行與相容性生成 ---
 
 def parse_single_playlist(source_url: str) -> list:
     channels = []
@@ -401,19 +393,24 @@ def generate_m3u(channels: list):
     final_list = list(final_dict.values())
     final_list.sort(key=get_sort_key)
 
-    content = '#EXTM3U x-tvg-url="https://epg.112114.xyz/pp.xml"\n'
-    content += f'# Update: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n'
+    # 嚴格遵循 MoonTV / TiviMate 標準兩行規範，移除中間干擾行
+    lines = ['#EXTM3U x-tvg-url="https://epg.112114.xyz/pp.xml" url-tvg="https://epg.112114.xyz/pp.xml"']
 
     for item in final_list:
         name = item["name"].replace('臺', '台')
-        content += f'#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/{name}.png",{name}\n'
-        content += f'#EXTVLCOPT:http-user-agent={IPTV_UA}\n'
-        content += f'{item["url"]}\n'
+        logo_url = f"https://epg.112114.xyz/logo/{name}.png"
+        # 完整的標準屬性：tvg-name, tvg-logo, group-title
+        lines.append(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo_url}" group-title="Hong Kong",{name}')
+        # 下一行緊貼實際串流網址 (第 2 行對齊)
+        lines.append(f'{item["url"]}')
+
+    # 使用標準換行符輸出
+    content = "\n".join(lines) + "\n"
 
     with open("hk_live.m3u", "w", encoding="utf-8") as f:
         f.write(content)
 
-    print(f"\n🎉 驗證完成！共篩選出 {len(final_list)} 個實質可解碼播放的優質香港電視頻道。", flush=True)
+    print(f"\n🎉 驗證完成！已依照 MoonTV 標準格式導出 {len(final_list)} 個頻道。", flush=True)
 
 if __name__ == "__main__":
     candidates = fetch_and_parse()
