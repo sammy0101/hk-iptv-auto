@@ -1,5 +1,5 @@
 # Complete Project Codebase
-Generated on: Thu Sep 24 14:57:25 UTC 2026
+Generated on: Thu Sep 24 14:57:44 UTC 2026
 
 ## File: main.py
 ````py
@@ -9,14 +9,14 @@ import json
 import base64
 import datetime
 import subprocess
-from urllib.parse import urlparse, urlunparse, quote
+import shutil
+from urllib.parse import urlparse, urlunparse, quote, urljoin
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from opencc import OpenCC
 import m3u8
 
 cc = OpenCC('s2t')
 
-# 模擬標準 Android TV 播放器標頭 (穿透防盜鏈)
 IPTV_UA = 'okhttp/3.15.0 (Linux; Android 11; TVBox)'
 HEADERS = {
     'User-Agent': IPTV_UA,
@@ -24,7 +24,12 @@ HEADERS = {
     'Connection': 'keep-alive'
 }
 
-# --- 1. 頂級動態導航大庫 (自動從這 6 個熱門庫動態挖掘單倉、多倉與在線源) ---
+# 檢測系統是否具備 ffprobe
+HAS_FFPROBE = shutil.which('ffprobe') is not None
+if not HAS_FFPROBE:
+    print("⚠️ 警告: 系統環境未安裝 ffprobe，將自動切換為【Python 原生切片穿透驗證】", flush=True)
+
+# --- 1. 動態上游導航大庫 ---
 TARGET_README_URLS = [
     "https://raw.githubusercontent.com/youhunwl/TVAPP/main/README.md",
     "https://raw.githubusercontent.com/ngo5/IPTV/main/README.md",
@@ -34,16 +39,13 @@ TARGET_README_URLS = [
     "https://raw.githubusercontent.com/Newtxin/TVBoxSource/main/README.md"
 ]
 
-# --- 2. 深度搜尋甄選出的「高畫質 / 香港頻道」直連聚合清單 ---
+# --- 2. 香港頻道直連匯總 ---
 SPECIFIC_HK_DIRECT_SOURCES = [
-    # 國際權威與專屬分區
     "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/hk.m3u",
     "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlists/playlist_hong_kong.m3u8",
     "https://raw.githubusercontent.com/s14685/tv/main/iptvhk.txt",
     "https://raw.githubusercontent.com/hujingguang/ChinaIPTV/main/HongKong.m3u8",
     "https://epg.pw/test_channels_hong_kong.m3u",
-    
-    # 知名大佬自動更新庫
     "https://raw.githubusercontent.com/fanmingming/live/main/tv/m3u/ipv6.m3u",
     "https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.m3u",
     "https://raw.githubusercontent.com/suxuang/myIPTV/main/ipv4.m3u",
@@ -51,8 +53,6 @@ SPECIFIC_HK_DIRECT_SOURCES = [
     "https://raw.githubusercontent.com/Kimentanm/aptv/master/m3u/iptv.m3u",
     "https://raw.githubusercontent.com/vbskycn/iptv/master/tv/iptv4.m3u",
     "https://raw.githubusercontent.com/YueChan/Live/main/IPTV.m3u",
-    
-    # 本次深度檢索新增的核心直連源
     "https://raw.githubusercontent.com/kimwang1978/collect-tv-txt/main/merged_output.txt",
     "https://raw.githubusercontent.com/ssili126/tv/main/itvlist.txt",
     "https://raw.githubusercontent.com/Fairy8o/IPTV/main/PDX-V4.txt",
@@ -61,7 +61,7 @@ SPECIFIC_HK_DIRECT_SOURCES = [
     "https://raw.githubusercontent.com/qingwen07/awesome-iptv/main/tvbox_live_all.txt"
 ]
 
-# --- 3. 嚴格過濾與排序規則 ---
+# --- 3. 嚴格過濾規則 ---
 KEYWORDS = [
     "ViuTV", "Viutv", "VIUTV", "ViuTV 6", "ViuTVsix",
     "HOY", "奇妙電視",
@@ -91,16 +91,14 @@ ORDER_KEYWORDS = [
     "Now新聞", "Now直播"
 ]
 
-# 香港官方直連保底
 OFFICIAL_CHANNELS = [
     {"name": "港台電視31", "url": "https://rthktv31-live.akamaized.net/hls/live/2036818/RTHKTV31/master.m3u8"},
     {"name": "港台電視32", "url": "https://rthktv32-live.akamaized.net/hls/live/2036819/RTHKTV32/master.m3u8"}
 ]
 
-# --- 4. 網絡編碼與通用探針 ---
+# --- 4. 輔助函數 ---
 
 def clean_and_encode_url(url: str) -> str:
-    """清理 Markdown 雜訊、修復 GitHub Blob 為 Raw 直鏈，並轉換 Punycode 中文網址"""
     url = url.strip().rstrip(')>],;\'"')
     if "github.com/" in url and "/blob/" in url:
         url = url.replace("github.com/", "raw.githubusercontent.com/").replace("/blob/", "/")
@@ -146,7 +144,6 @@ def parse_tvbox_payload(text: str) -> dict:
     return {}
 
 def process_candidate_url(target_url: str, visited: set = None, depth: int = 0) -> list:
-    """自動判定直連清單、單倉 lives 挖掘與多倉遞迴展開"""
     if visited is None:
         visited = set()
     if depth > 3:
@@ -196,13 +193,12 @@ def process_candidate_url(target_url: str, visited: set = None, depth: int = 0) 
     return list(set(extracted_lives))
 
 def extract_all_sources() -> list:
-    """動態掃描 6 大上游導航庫並合併直連清單"""
-    print("🌐 開始動態提取所有上游資源 (6 大導航庫 + 直連源)...", flush=True)
+    print("🌐 開始動態提取所有上游資源...", flush=True)
     all_extracted_playlists = set([clean_and_encode_url(u) for u in SPECIFIC_HK_DIRECT_SOURCES])
     candidate_urls = set()
 
     for readme_url in TARGET_README_URLS:
-        print(f"  -> 正在讀取導航清單: {readme_url}", flush=True)
+        print(f"  -> 讀取導航清單: {readme_url}", flush=True)
         content = fetch_raw_content(readme_url, timeout=12)
         if not content:
             continue
@@ -214,7 +210,7 @@ def extract_all_sources() -> list:
                 continue
             candidate_urls.add(clean_u)
 
-    print(f"🔍 全網共獲取到 {len(candidate_urls)} 個候選網址，開始深入解碼與展開...", flush=True)
+    print(f"🔍 取得 {len(candidate_urls)} 個候選網址，開始解析...", flush=True)
 
     with ThreadPoolExecutor(max_workers=20) as executor:
         futures = [executor.submit(process_candidate_url, u) for u in candidate_urls]
@@ -226,17 +222,60 @@ def extract_all_sources() -> list:
                 pass
 
     final_sources = list(all_extracted_playlists)
-    print(f"✅ 全部分析完畢！共聚合出 {len(final_sources)} 個可下載的電視直播源清單。", flush=True)
+    print(f"✅ 共聚合出 {len(final_sources)} 個直播源清單。", flush=True)
     return final_sources
 
-# --- 5. ffprobe 真機解碼級驗證 ---
+# --- 5. 雙軌真流媒體穿透檢測器 ---
 
-def check_stream_with_ffprobe(url: str, timeout: int = 5) -> bool:
+def check_hls_segments_python(url: str, timeout: int = 6) -> bool:
+    """純 Python 深度檢測：下載 m3u8，提取真實音視頻切片 (.ts/.m4s) 並驗證是否真有數據"""
+    try:
+        r = requests.get(url, headers=HEADERS, timeout=timeout, stream=True)
+        if r.status_code != 200:
+            return False
+        
+        text = ""
+        for chunk in r.iter_content(chunk_size=4096):
+            text += chunk.decode('utf-8', errors='ignore')
+            if len(text) > 8192:
+                break
+        r.close()
+
+        if '#EXTM3U' not in text:
+            return False
+
+        parsed = m3u8.loads(text)
+        target_seg_url = None
+
+        # 多碼率 Master Playlist
+        if parsed.is_variant and parsed.playlists:
+            sub_url = urljoin(url, parsed.playlists[0].uri)
+            sub_r = requests.get(sub_url, headers=HEADERS, timeout=timeout)
+            if sub_r.status_code != 200:
+                return False
+            sub_parsed = m3u8.loads(sub_r.text)
+            if sub_parsed.segments:
+                target_seg_url = urljoin(sub_url, sub_parsed.segments[0].uri)
+        elif parsed.segments:
+            target_seg_url = urljoin(url, parsed.segments[0].uri)
+
+        if target_seg_url:
+            seg_res = requests.get(target_seg_url, headers=HEADERS, timeout=timeout, stream=True)
+            if seg_res.status_code == 200:
+                data = next(seg_res.iter_content(chunk_size=2048), b'')
+                seg_res.close()
+                return len(data) > 300
+    except Exception:
+        pass
+    return False
+
+def check_stream_with_ffprobe(url: str, timeout: int = 6) -> bool:
+    """系統 ffprobe 工具真機解碼探測"""
     cmd = [
         'ffprobe',
         '-v', 'error',
         '-user_agent', IPTV_UA,
-        '-show_entries', 'stream=codec_type,codec_name',
+        '-show_entries', 'stream=codec_type',
         '-of', 'json',
         '-timeout', str(timeout * 1000000),
         url
@@ -251,36 +290,27 @@ def check_stream_with_ffprobe(url: str, timeout: int = 5) -> bool:
     except Exception:
         return False
 
-def fast_pre_filter(url: str, timeout: int = 3) -> bool:
-    try:
-        r = requests.get(url, headers=HEADERS, timeout=timeout, stream=True)
-        if r.status_code != 200:
-            return False
-        header_bytes = b''
-        for chunk in r.iter_content(chunk_size=1024):
-            header_bytes += chunk
-            if len(header_bytes) >= 4096:
-                break
-        r.close()
-        text = header_bytes.decode('utf-8', errors='ignore')
-        if any(err in text.lower() for err in ['error', 'expired', 'denied', 'unauthorized', '404 not found', '<html>']):
-            return False
-        return True
-    except Exception:
-        return False
-
 def verify_single_channel(ch: dict) -> tuple:
     url = ch['url']
-    if any(domain in url for domain in ['rthk.hk', 'akamaized.net']):
+    
+    # 官方 CDN 在海外必報 403，給予放行保護
+    if any(d in url.lower() for d in ['rthk.hk', 'akamaized.net', 'akamaihd.net']):
         return ch, True
-    if not fast_pre_filter(url):
-        return ch, False
-    is_playable = check_stream_with_ffprobe(url, timeout=5)
-    return ch, is_playable
+    
+    # 優先嘗試 ffprobe；若環境未安裝則降級為 Python 視頻切片測試
+    if HAS_FFPROBE:
+        is_alive = check_stream_with_ffprobe(url, timeout=6)
+        if not is_alive:
+            # 容錯：部分反代源可能被 ffprobe 逾時誤殺，使用 Python 切片二次複查
+            is_alive = check_hls_segments_python(url, timeout=6)
+    else:
+        is_alive = check_hls_segments_python(url, timeout=6)
+        
+    return ch, is_alive
 
 def check_channels_parallel(channels: list, max_workers=12) -> list:
     valid_channels = []
-    print(f"\n🔍 開始對 {len(channels)} 個候選源進行【ffprobe 真機解碼級驗證】...", flush=True)
+    print(f"\n🔍 開始對 {len(channels)} 個候選源進行【真機解碼 & 切片雙軌檢測】...", flush=True)
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = [executor.submit(verify_single_channel, ch) for ch in channels]
         for f in as_completed(futures):
@@ -299,10 +329,9 @@ def get_sort_key(item: dict) -> int:
             return index
     return 999
 
-# --- 6. 多線程極速解析香港頻道 ---
+# --- 6. 主流程執行 ---
 
 def parse_single_playlist(source_url: str) -> list:
-    """下載並解析單一 M3U / TXT 清單中的香港電視頻道"""
     channels = []
     content = fetch_raw_content(source_url, timeout=8)
     if not content:
@@ -349,7 +378,6 @@ def fetch_and_parse() -> list:
     with ThreadPoolExecutor(max_workers=20) as executor:
         futures = {executor.submit(parse_single_playlist, s): s for s in playlist_sources}
         for f in as_completed(futures):
-            src = futures[f]
             try:
                 ch_list = f.result()
                 added = 0
@@ -358,8 +386,6 @@ def fetch_and_parse() -> list:
                         seen_urls.add(ch['url'])
                         found_channels.append(ch)
                         added += 1
-                if added > 0:
-                    print(f"  ⭐ 提取到 {added} 個候選頻道 (來源: {src})", flush=True)
             except Exception:
                 pass
 
