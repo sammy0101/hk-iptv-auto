@@ -4,7 +4,7 @@ on:
   schedule:
     # 每天香港時間 08:00 和 20:00 運行 (UTC 00:00, 12:00)
     - cron: '0 0,12 * * *'
-  workflow_dispatch: # 允許手動點擊按鈕
+  workflow_dispatch: # 支援手動觸發
 
 permissions:
   contents: write
@@ -15,23 +15,28 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
 
-    - name: Install dependencies
+    - name: Install System FFmpeg
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg
+
+    - name: Install Python dependencies
       run: pip install -r requirements.txt
 
     - name: Run script
-      run: python main.py
+      run: python -u main.py
 
     - name: Commit and push
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add hk_live.m3u
-        git commit -m "Auto-update channel list" || echo "No changes to commit"
+        git commit -m "Auto-update channel list [skip ci]" || echo "No changes to commit"
         git push
