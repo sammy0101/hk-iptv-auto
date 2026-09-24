@@ -1,5 +1,5 @@
 # Complete Project Codebase
-Generated on: Thu Sep 24 14:52:21 UTC 2026
+Generated on: Thu Sep 24 14:57:25 UTC 2026
 
 ## File: main.py
 ````py
@@ -408,7 +408,7 @@ on:
   schedule:
     # 每天香港時間 08:00 和 20:00 運行 (UTC 00:00, 12:00)
     - cron: '0 0,12 * * *'
-  workflow_dispatch: # 允許手動點擊按鈕
+  workflow_dispatch: # 支援手動觸發
 
 permissions:
   contents: write
@@ -419,25 +419,30 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
 
-    - name: Install dependencies
+    - name: Install System FFmpeg
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg
+
+    - name: Install Python dependencies
       run: pip install -r requirements.txt
 
     - name: Run script
-      run: python main.py
+      run: python -u main.py
 
     - name: Commit and push
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add hk_live.m3u
-        git commit -m "Auto-update channel list" || echo "No changes to commit"
+        git commit -m "Auto-update channel list [skip ci]" || echo "No changes to commit"
         git push
 
 ````
@@ -526,13 +531,37 @@ jobs:
 ## File: hk_live.m3u
 ````m3u
 #EXTM3U x-tvg-url="https://epg.112114.xyz/pp.xml"
-# Update: 2026-09-24 11:20:03
+# Update: 2026-09-24 14:54:04
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視31.png",港台電視31
 #EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
 https://rthktv31-live.akamaized.net/hls/live/2036818/RTHKTV31/master.m3u8
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視32.png",港台電視32
 #EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
 https://rthktv32-live.akamaized.net/hls/live/2036819/RTHKTV32/master.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK32.png",RTHK32
+#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+http://rthktv32-live.akamaized.net/hls/live/2036819/RTHKTV32/master.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK普通話.png",RTHK普通話
+#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+https://rthkradiopth-live.akamaized.net/hls/live/2040082/radiopth/master.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK3.png",RTHK3
+#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+https://rthkradio3-live.akamaized.net/hls/live/2040079/radio3/master.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視33.png",港台電視33
+#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+https://rthktv33-live.akamaized.net/hls/live/2101641/RTHKTV33/stream05/streamPlaylist.m3u8?
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視34.png",港台電視34
+#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+https://rthktv34-live.akamaized.net/hls/live/2101642/RTHKTV34/stream04/streamPlaylist.m3u8?
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視34.png",港台電視34
+#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+https://rthktv34-live.akamaized.net/hls/live/2101642/RTHKTV34/stream05/streamPlaylist.m3u8?
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視35.png",港台電視35
+#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+https://rthktv35-live.akamaized.net/hls/live/2101643/RTHKTV35/stream04/streamPlaylist.m3u8?
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視35.png",港台電視35
+#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+https://rthktv35-live.akamaized.net/hls/live/2101643/RTHKTV35/stream05/streamPlaylist.m3u8?
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 33 (1080p) [Geo-blocked].png",RTHK TV 33 (1080p) [Geo-blocked]
 #EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
 https://rthktv33-live.akamaized.net/hls/live/2101641/RTHKTV33/master.m3u8
@@ -542,6 +571,9 @@ https://rthktv34-live.akamaized.net/hls/live/2101642/RTHKTV34/master.m3u8
 #EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 35 (1080p) [Geo-blocked].png",RTHK TV 35 (1080p) [Geo-blocked]
 #EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
 https://rthktv35-live.akamaized.net/hls/live/2101643/RTHKTV35/master.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 36 (港台電視36) (1080p) [Geo-blocked].png",RTHK TV 36 (港台電視36) (1080p) [Geo-blocked]
+#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+https://rthktv36-live.akamaized.net/hls/live/2112176/RTHKTV36/master.m3u8
 
 ````
 
