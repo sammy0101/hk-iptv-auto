@@ -1,191 +1,127 @@
-#EXTM3U x-tvg-url="https://epg.112114.xyz/pp.xml"
-# Update: 2026-09-24 15:00:59
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-http://r.jdshipin.com/62WM7
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTM3U x-tvg-url="https://epg.112114.xyz/pp.xml" url-tvg="https://epg.112114.xyz/pp.xml"
+#EXTINF:-1 tvg-name="翡翠台" tvg-logo="https://epg.112114.xyz/logo/翡翠台.png" group-title="Hong Kong",翡翠台
 http://r.jdshipin.com/GeWKr
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="翡翠台" tvg-logo="https://epg.112114.xyz/logo/翡翠台.png" group-title="Hong Kong",翡翠台
 http://r.jdshipin.com/qClQf
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="翡翠台" tvg-logo="https://epg.112114.xyz/logo/翡翠台.png" group-title="Hong Kong",翡翠台
 http://r.jdshipin.com/n90gt
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="翡翠台" tvg-logo="https://epg.112114.xyz/logo/翡翠台.png" group-title="Hong Kong",翡翠台
 http://r.jdshipin.com/qrfbg
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/TVB翡翠台 1080P.png",TVB翡翠台 1080P
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-http://php.jdshipin.com:8880/TVOD/iptv.php?id=fct3
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台.png",翡翠台
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="翡翠台" tvg-logo="https://epg.112114.xyz/logo/翡翠台.png" group-title="Hong Kong",翡翠台
+http://r.jdshipin.com/62WM7
+#EXTINF:-1 tvg-name="TVB翡翠台 4K" tvg-logo="https://epg.112114.xyz/logo/TVB翡翠台 4K.png" group-title="Hong Kong",TVB翡翠台 4K
 http://php.jdshipin.com:8880/TVOD/iptv.php?id=fct4
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/翡翠台北美版.png",翡翠台北美版
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-http://php.jdshipin.com:8880/TVOD/iptv.php?id=j1
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/TVB翡翠台（備用）.png",TVB翡翠台（備用）
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="TVB翡翠台（備用）" tvg-logo="https://epg.112114.xyz/logo/TVB翡翠台（備用）.png" group-title="Hong Kong",TVB翡翠台（備用）
 http://php.jdshipin.com:8880/TVOD/iptv.php?id=fct
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/無線新聞.png",無線新聞
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-http://r.jdshipin.com/CkuBd
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/無線新聞.png",無線新聞
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="TVB翡翠台 1080P" tvg-logo="https://epg.112114.xyz/logo/TVB翡翠台 1080P.png" group-title="Hong Kong",TVB翡翠台 1080P
+http://php.jdshipin.com:8880/TVOD/iptv.php?id=fct3
+#EXTINF:-1 tvg-name="翡翠台北美版" tvg-logo="https://epg.112114.xyz/logo/翡翠台北美版.png" group-title="Hong Kong",翡翠台北美版
+http://php.jdshipin.com:8880/TVOD/iptv.php?id=j1
+#EXTINF:-1 tvg-name="無線新聞" tvg-logo="https://epg.112114.xyz/logo/無線新聞.png" group-title="Hong Kong",無線新聞
 http://php.jdshipin.com/TVOD/iptv.php?id=wxxw
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/無線新聞.png",無線新聞
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="無線新聞" tvg-logo="https://epg.112114.xyz/logo/無線新聞.png" group-title="Hong Kong",無線新聞
 https://h5cdn3.kylintv.tv/live/tvbnews_iphone.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/明珠台.png",明珠台
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-http://r.jdshipin.com/ZQ4kN
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/明珠台.png",明珠台
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-http://r.jdshipin.com/jUx8K
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/明珠台.png",明珠台
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-http://php.jdshipin.com/TVOD/iptv.php?id=mzt2
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/TVB明珠台.png",TVB明珠台
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="無線新聞" tvg-logo="https://epg.112114.xyz/logo/無線新聞.png" group-title="Hong Kong",無線新聞
+http://r.jdshipin.com/CkuBd
+#EXTINF:-1 tvg-name="TVB明珠台" tvg-logo="https://epg.112114.xyz/logo/TVB明珠台.png" group-title="Hong Kong",TVB明珠台
 http://php.jdshipin.com/TVOD/iptv.php?id=mzt
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/TVB Plus.png",TVB Plus
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-http://r.jdshipin.com/Nr5jq
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/TVB Plus.png",TVB Plus
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="明珠台" tvg-logo="https://epg.112114.xyz/logo/明珠台.png" group-title="Hong Kong",明珠台
+http://r.jdshipin.com/ZQ4kN
+#EXTINF:-1 tvg-name="明珠台" tvg-logo="https://epg.112114.xyz/logo/明珠台.png" group-title="Hong Kong",明珠台
+http://r.jdshipin.com/jUx8K
+#EXTINF:-1 tvg-name="明珠台" tvg-logo="https://epg.112114.xyz/logo/明珠台.png" group-title="Hong Kong",明珠台
+http://php.jdshipin.com/TVOD/iptv.php?id=mzt2
+#EXTINF:-1 tvg-name="TVB Plus" tvg-logo="https://epg.112114.xyz/logo/TVB Plus.png" group-title="Hong Kong",TVB Plus
 http://r.jdshipin.com/ndGgS
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/Viutv.png",Viutv
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-http://php.jdshipin.com/TVOD/iptv.php?id=viutv2
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/Viutv.png",Viutv
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-http://r.jdshipin.com/TcKr2
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/Viutv.png",Viutv
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="TVB Plus" tvg-logo="https://epg.112114.xyz/logo/TVB Plus.png" group-title="Hong Kong",TVB Plus
+http://r.jdshipin.com/Nr5jq
+#EXTINF:-1 tvg-name="Viutv" tvg-logo="https://epg.112114.xyz/logo/Viutv.png" group-title="Hong Kong",Viutv
 http://php.jdshipin.com/TVOD/iptv.php?id=viutv
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/Viutv.png",Viutv
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="Viutv" tvg-logo="https://epg.112114.xyz/logo/Viutv.png" group-title="Hong Kong",Viutv
+http://r.jdshipin.com/TcKr2
+#EXTINF:-1 tvg-name="Viutv" tvg-logo="https://epg.112114.xyz/logo/Viutv.png" group-title="Hong Kong",Viutv
 http://r.jdshipin.com/vSJvl
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/HOY TV.png",HOY TV
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="Viutv" tvg-logo="https://epg.112114.xyz/logo/Viutv.png" group-title="Hong Kong",Viutv
+http://php.jdshipin.com/TVOD/iptv.php?id=viutv2
+#EXTINF:-1 tvg-name="HOY TV" tvg-logo="https://epg.112114.xyz/logo/HOY TV.png" group-title="Hong Kong",HOY TV
 http://r.jdshipin.com/sFw4S
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/HOY TV.png",HOY TV
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="HOY TV" tvg-logo="https://epg.112114.xyz/logo/HOY TV.png" group-title="Hong Kong",HOY TV
 http://php.jdshipin.com/TVOD/iptv.php?id=hoytv
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/HOY TV.png",HOY TV
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="HOY TV" tvg-logo="https://epg.112114.xyz/logo/HOY TV.png" group-title="Hong Kong",HOY TV
 http://uc6.i-cable.com/live_freedirect/opentvhd001_h.live/playlist.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/HOY TV.png",HOY TV
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="HOY TV" tvg-logo="https://epg.112114.xyz/logo/HOY TV.png" group-title="Hong Kong",HOY TV
 https://uc6.i-cable.com/live_freedirect/opentvhd001_h.live/playlist.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/HOY TV.png",HOY TV
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="HOY TV" tvg-logo="https://epg.112114.xyz/logo/HOY TV.png" group-title="Hong Kong",HOY TV
 https://uc6.i-cable.com/live_freedirect/opentvhd001.live/playlist.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/有線新聞.png",有線新聞
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="有線新聞" tvg-logo="https://epg.112114.xyz/logo/有線新聞.png" group-title="Hong Kong",有線新聞
 http://61.10.2.134:80/live_freedirect/freehd209_h.live/chunklist.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/有線新聞.png",有線新聞
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="有線新聞" tvg-logo="https://epg.112114.xyz/logo/有線新聞.png" group-title="Hong Kong",有線新聞
 http://61.10.2.141/live_freedirect/hd110_h.live/playlist.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/有線新聞.png",有線新聞
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="有線新聞" tvg-logo="https://epg.112114.xyz/logo/有線新聞.png" group-title="Hong Kong",有線新聞
 http://cm61-10-2-140.hkcable.com.hk/live_freedirect/freehd209_h.live/chunklist_w135209556.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/有線新聞.png",有線新聞
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="有線新聞" tvg-logo="https://epg.112114.xyz/logo/有線新聞.png" group-title="Hong Kong",有線新聞
 http://61.10.2.141:80/live_freedirect/freehd209_h.live/chunklist.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/有線新聞.png",有線新聞
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-http://61.10.2.141/live_freedirect/freehd209_h.live/playlist.m3u
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/有線新聞.png",有線新聞
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="有線新聞" tvg-logo="https://epg.112114.xyz/logo/有線新聞.png" group-title="Hong Kong",有線新聞
 http://61.10.2.151:80/live_freedirect/freehd209_h.live/chunklist_w1201085709.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/有線新聞.png",有線新聞
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="有線新聞" tvg-logo="https://epg.112114.xyz/logo/有線新聞.png" group-title="Hong Kong",有線新聞
+http://61.10.2.141/live_freedirect/freehd209_h.live/playlist.m3u
+#EXTINF:-1 tvg-name="有線新聞" tvg-logo="https://epg.112114.xyz/logo/有線新聞.png" group-title="Hong Kong",有線新聞
 http://61.10.2.140/live_freedirect/opentvhd002_h.live/playlist.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/有線新聞.png",有線新聞
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="有線新聞" tvg-logo="https://epg.112114.xyz/logo/有線新聞.png" group-title="Hong Kong",有線新聞
 http://cm61-10-2-143.hkcable.com.hk/live_freedirect/freehd209_h.live/chunklist_w1949275579.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/有線新聞.png",有線新聞
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="有線新聞" tvg-logo="https://epg.112114.xyz/logo/有線新聞.png" group-title="Hong Kong",有線新聞
 http://61.10.2.146/live_freedirect/freehd209_h.live/playlist.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/有線新聞台.png",有線新聞台
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="有線新聞台" tvg-logo="https://epg.112114.xyz/logo/有線新聞台.png" group-title="Hong Kong",有線新聞台
 http://61.10.2.140:80/live_freedirect/freehd209_h.live/chunklist_w135209556.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/有線新聞.png",有線新聞
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="有線新聞" tvg-logo="https://epg.112114.xyz/logo/有線新聞.png" group-title="Hong Kong",有線新聞
 http://61.10.2.140/live_freedirect/freehd209_h.live/playlist.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/有線新聞.png",有線新聞
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="有線新聞" tvg-logo="https://epg.112114.xyz/logo/有線新聞.png" group-title="Hong Kong",有線新聞
 http://cm61-10-2-143.hkcable.com.hk/live_freedirect/hd110_h.live/playlist.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/有線新聞台.png",有線新聞台
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="有線新聞台" tvg-logo="https://epg.112114.xyz/logo/有線新聞台.png" group-title="Hong Kong",有線新聞台
 http://61.10.2.141/live_freedirect/freehd209_h.live/playlist.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/有線新聞台.png",有線新聞台
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="有線新聞台" tvg-logo="https://epg.112114.xyz/logo/有線新聞台.png" group-title="Hong Kong",有線新聞台
 http://cm61-10-2-143.hkcable.com.hk/live_freedirect/freehd209_h.live/playlist.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/有線新聞.png",有線新聞
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="有線新聞" tvg-logo="https://epg.112114.xyz/logo/有線新聞.png" group-title="Hong Kong",有線新聞
 http://61.10.2.140/live_freedirect/freehd209_h.live/chunklist_w135209556.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視31.png",港台電視31
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="港台電視31" tvg-logo="https://epg.112114.xyz/logo/港台電視31.png" group-title="Hong Kong",港台電視31
 https://rthktv31-live.akamaized.net/hls/live/2036818/RTHKTV31/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 31 (港台電視31) (360p) [Geo-blocked].png",RTHK TV 31 (港台電視31) (360p) [Geo-blocked]
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="RTHK TV 31 (港台電視31) (360p) [Geo-blocked]" tvg-logo="https://epg.112114.xyz/logo/RTHK TV 31 (港台電視31) (360p) [Geo-blocked].png" group-title="Hong Kong",RTHK TV 31 (港台電視31) (360p) [Geo-blocked]
 https://rthklive1-lh.akamaihd.net/i/rthk31_1@167495/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK31.png",RTHK31
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="港台電視31" tvg-logo="https://epg.112114.xyz/logo/港台電視31.png" group-title="Hong Kong",港台電視31
 http://php.jdshipin.com:8880/TVOD/iptv.php?id=rthk31
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK31.png",RTHK31
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="RTHK31" tvg-logo="https://epg.112114.xyz/logo/RTHK31.png" group-title="Hong Kong",RTHK31
 http://rthklive1-lh.akamaihd.net/i/rthk31_1@167495/index_810_av-b.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK31.png",RTHK31
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="RTHK31" tvg-logo="https://epg.112114.xyz/logo/RTHK31.png" group-title="Hong Kong",RTHK31
 http://rthklive1-lh.akamaihd.net/i/rthk31_1@167495/index_2052_av-b.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視32.png",港台電視32
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="港台電視32" tvg-logo="https://epg.112114.xyz/logo/港台電視32.png" group-title="Hong Kong",港台電視32
 https://rthktv32-live.akamaized.net/hls/live/2036819/RTHKTV32/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 32 (港台電視32) (360p) [Geo-blocked].png",RTHK TV 32 (港台電視32) (360p) [Geo-blocked]
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="RTHK TV 32 (港台電視32) (360p) [Geo-blocked]" tvg-logo="https://epg.112114.xyz/logo/RTHK TV 32 (港台電視32) (360p) [Geo-blocked].png" group-title="Hong Kong",RTHK TV 32 (港台電視32) (360p) [Geo-blocked]
 https://rthklive2-lh.akamaihd.net/i/rthk32_1@168450/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK32.png",RTHK32
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="港台電視32" tvg-logo="https://epg.112114.xyz/logo/港台電視32.png" group-title="Hong Kong",港台電視32
 http://php.jdshipin.com:8880/TVOD/iptv.php?id=rthk32
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK32.png",RTHK32
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="RTHK32" tvg-logo="https://epg.112114.xyz/logo/RTHK32.png" group-title="Hong Kong",RTHK32
 http://rthktv32-live.akamaized.net/hls/live/2036819/RTHKTV32/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK32.png",RTHK32
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="RTHK32" tvg-logo="https://epg.112114.xyz/logo/RTHK32.png" group-title="Hong Kong",RTHK32
 http://rthklive2-lh.akamaihd.net/i/rthk32_1@168450/index_2052_av-b.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 33 (港台電視33) (1080p) [Geo-blocked].png",RTHK TV 33 (港台電視33) (1080p) [Geo-blocked]
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="RTHK TV 33 (港台電視33) (1080p) [Geo-blocked]" tvg-logo="https://epg.112114.xyz/logo/RTHK TV 33 (港台電視33) (1080p) [Geo-blocked].png" group-title="Hong Kong",RTHK TV 33 (港台電視33) (1080p) [Geo-blocked]
 https://rthktv33-live.akamaized.net/hls/live/2101641/RTHKTV33/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 34 (港台電視34) (1080p) [Geo-blocked].png",RTHK TV 34 (港台電視34) (1080p) [Geo-blocked]
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="RTHK TV 34 (港台電視34) (1080p) [Geo-blocked]" tvg-logo="https://epg.112114.xyz/logo/RTHK TV 34 (港台電視34) (1080p) [Geo-blocked].png" group-title="Hong Kong",RTHK TV 34 (港台電視34) (1080p) [Geo-blocked]
 https://rthktv34-live.akamaized.net/hls/live/2101642/RTHKTV34/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 35 (港台電視35) (1080p) [Geo-blocked].png",RTHK TV 35 (港台電視35) (1080p) [Geo-blocked]
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="RTHK TV 35 (港台電視35) (1080p) [Geo-blocked]" tvg-logo="https://epg.112114.xyz/logo/RTHK TV 35 (港台電視35) (1080p) [Geo-blocked].png" group-title="Hong Kong",RTHK TV 35 (港台電視35) (1080p) [Geo-blocked]
 https://rthktv35-live.akamaized.net/hls/live/2101643/RTHKTV35/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 36 (港台電視36) (1080p) [Geo-blocked].png",RTHK TV 36 (港台電視36) (1080p) [Geo-blocked]
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="RTHK TV 36 (港台電視36) (1080p) [Geo-blocked]" tvg-logo="https://epg.112114.xyz/logo/RTHK TV 36 (港台電視36) (1080p) [Geo-blocked].png" group-title="Hong Kong",RTHK TV 36 (港台電視36) (1080p) [Geo-blocked]
 https://rthktv36-live.akamaized.net/hls/live/2112176/RTHKTV36/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視33.png",港台電視33
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="港台電視33" tvg-logo="https://epg.112114.xyz/logo/港台電視33.png" group-title="Hong Kong",港台電視33
 https://rthktv33-live.akamaized.net/hls/live/2101641/RTHKTV33/stream05/streamPlaylist.m3u8?
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視34.png",港台電視34
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="港台電視34" tvg-logo="https://epg.112114.xyz/logo/港台電視34.png" group-title="Hong Kong",港台電視34
 https://rthktv34-live.akamaized.net/hls/live/2101642/RTHKTV34/stream04/streamPlaylist.m3u8?
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視34.png",港台電視34
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="港台電視34" tvg-logo="https://epg.112114.xyz/logo/港台電視34.png" group-title="Hong Kong",港台電視34
 https://rthktv34-live.akamaized.net/hls/live/2101642/RTHKTV34/stream05/streamPlaylist.m3u8?
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視35.png",港台電視35
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="港台電視35" tvg-logo="https://epg.112114.xyz/logo/港台電視35.png" group-title="Hong Kong",港台電視35
 https://rthktv35-live.akamaized.net/hls/live/2101643/RTHKTV35/stream04/streamPlaylist.m3u8?
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視35.png",港台電視35
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="港台電視35" tvg-logo="https://epg.112114.xyz/logo/港台電視35.png" group-title="Hong Kong",港台電視35
 https://rthktv35-live.akamaized.net/hls/live/2101643/RTHKTV35/stream05/streamPlaylist.m3u8?
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK3.png",RTHK3
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="RTHK3" tvg-logo="https://epg.112114.xyz/logo/RTHK3.png" group-title="Hong Kong",RTHK3
 https://rthkradio3-live.akamaized.net/hls/live/2040079/radio3/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK普通話.png",RTHK普通話
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+#EXTINF:-1 tvg-name="RTHK普通話" tvg-logo="https://epg.112114.xyz/logo/RTHK普通話.png" group-title="Hong Kong",RTHK普通話
 https://rthkradiopth-live.akamaized.net/hls/live/2040082/radiopth/master.m3u8
