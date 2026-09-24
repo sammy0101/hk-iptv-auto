@@ -1,13 +1,5 @@
 # Complete Project Codebase
-Generated on: Wed Sep 23 17:14:33 UTC 2026
-
-## File: requirements.txt
-````txt
-requests
-opencc-python-reimplemented
-m3u8
-
-````
+Generated on: Thu Sep 24 11:17:35 UTC 2026
 
 ## File: main.py
 ````py
@@ -17,14 +9,14 @@ import json
 import base64
 import datetime
 import subprocess
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import urlparse, urlunparse, quote
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from opencc import OpenCC
 import m3u8
 
 cc = OpenCC('s2t')
 
-# 模擬標準 Android IPTV 專用播放器標頭
+# 模擬標準 Android TV 播放器標頭
 IPTV_UA = 'okhttp/3.15.0 (Linux; Android 11; TVBox)'
 HEADERS = {
     'User-Agent': IPTV_UA,
@@ -32,48 +24,13 @@ HEADERS = {
     'Connection': 'keep-alive'
 }
 
-# --- 1. 動態上游同步設定 (自動從這兩個知名大倉庫抓取最新源) ---
-UPSTREAM_README_URLS = [
+# --- 1. 唯一上游目標 (只從這兩個 README 動態爬取) ---
+TARGET_README_URLS = [
     "https://raw.githubusercontent.com/youhunwl/TVAPP/main/README.md",
     "https://raw.githubusercontent.com/ngo5/IPTV/main/README.md"
 ]
 
-# --- 2. 備用與手動指定的直連直播源 ---
-FALLBACK_STANDARD_SOURCES = [
-    # 你的最新指定清單
-    "https://raw.githubusercontent.com/s14685/tv/main/iptvhk.txt",
-    "https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/master/streams/hk.m3u",
-    "https://raw.githubusercontent.com/hujingguang/ChinaIPTV/main/HongKong.m3u8",
-    "https://raw.githubusercontent.com/fanmingming/live/main/tv/m3u/ipv6.m3u",
-    "https://raw.githubusercontent.com/Kimentanm/aptv/master/m3u/iptv.m3u",
-    "https://raw.githubusercontent.com/YueChan/Live/main/IPTV.m3u",
-    "https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.m3u",
-    "https://epg.pw/test_channels_hong_kong.m3u",
-    "https://raw.githubusercontent.com/Free-TV/IPTV/refs/heads/master/playlists/playlist_hong_kong.m3u8",
-    "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8",
-    "https://raw.githubusercontent.com/vbskycn/iptv/master/tv/iptv4.m3u",
-    "https://raw.githubusercontent.com/zilong7728/Collect-IPTV/main/best_sorted.m3u",
-    
-    # 常用穩定備份源
-    "https://live.zbds.top/tv/iptv4.txt",
-    "https://live.zbds.top/tv/iptv4.m3u",
-    "https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/ipv4.m3u",
-    "https://raw.githubusercontent.com/suxuang/myIPTV/refs/heads/main/ipv6.m3u",
-    "https://raw.githubusercontent.com/BurningC4/Chinese-IPTV/master/TV-IPV4.m3u",
-    "https://raw.githubusercontent.com/BigBigGrandG/IPTV-URL/release/Gather.m3u",
-    "https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.m3u"
-]
-
-FALLBACK_TVBOX_CONFIGS = [
-    "http://www.饭太硬.net/tv",
-    "http://肥猫.net",
-    "http://我不是.摸鱼儿.top",
-    "https://raw.githubusercontent.com/yoursmile66/TVBox/main/XC.json",
-    "https://dxawi.github.io/0/0.json",
-    "http://xhztv.top/xhz"
-]
-
-# --- 3. 嚴格過濾與排序規則 ---
+# --- 2. 嚴格過濾與排序規則 ---
 KEYWORDS = [
     "ViuTV", "Viutv", "VIUTV", "ViuTV 6", "ViuTVsix",
     "HOY", "奇妙電視",
@@ -103,103 +60,172 @@ ORDER_KEYWORDS = [
     "Now新聞", "Now直播"
 ]
 
-# 最新可用香港官方源
+# 香港官方直連保底
 OFFICIAL_CHANNELS = [
     {"name": "港台電視31", "url": "https://rthktv31-live.akamaized.net/hls/live/2036818/RTHKTV31/master.m3u8"},
     {"name": "港台電視32", "url": "https://rthktv32-live.akamaized.net/hls/live/2036819/RTHKTV32/master.m3u8"}
 ]
 
-# --- 4. 輔助函數 ---
+# --- 3. URL 編碼與解析模組 ---
 
-def normalize_github_raw(url: str) -> str:
-    """自動修復 GitHub Blob 網頁為 Raw 直鏈"""
+def clean_and_encode_url(url: str) -> str:
+    """自動處理 Punycode 中文域名、中文路徑編碼及 GitHub Blob 直鏈轉換"""
+    url = url.strip()
     if "github.com/" in url and "/blob/" in url:
         url = url.replace("github.com/", "raw.githubusercontent.com/").replace("/blob/", "/")
-    return url
-
-def encode_punycode_url(url: str) -> str:
-    """將中文域名安全轉碼為 Punycode"""
     try:
-        url = normalize_github_raw(url)
         parts = urlparse(url)
         netloc = parts.netloc.encode('idna').decode('ascii')
-        return urlunparse((parts.scheme, netloc, parts.path, parts.params, parts.query, parts.fragment))
+        path = quote(parts.path, safe='/:@%')
+        query = quote(parts.query, safe='=&%:@')
+        return urlunparse((parts.scheme, netloc, path, parts.params, query, parts.fragment))
     except Exception:
         return url
 
-def sync_from_upstream_aggregators():
-    """動態向 youhunwl/TVAPP 及 ngo5/IPTV 同步最新清單"""
-    print("🌐 正在向上游大倉庫 (youhunwl / ngo5) 請求最新資源清單...", flush=True)
-    live_sources = set([normalize_github_raw(u) for u in FALLBACK_STANDARD_SOURCES])
-    tvbox_configs = set(FALLBACK_TVBOX_CONFIGS)
-
-    for upstream_url in UPSTREAM_README_URLS:
-        try:
-            r = requests.get(upstream_url, headers=HEADERS, timeout=10)
-            if r.status_code == 200:
-                content = r.text
-                extracted_links = re.findall(r'https?://[^\s#<>"\']+', content)
-                for link in extracted_links:
-                    link = normalize_github_raw(link.strip())
-                    if any(ext in link.lower() for ext in ['.apk', '.exe', '.zip', 'shields.io', '.jpg', '.png']):
-                        continue
-                    if any(link.lower().endswith(ext) for ext in ['.m3u', '.m3u8', '.txt']) or '/m3u/' in link:
-                        live_sources.add(link)
-                    else:
-                        tvbox_configs.add(link)
-                print(f"  ✅ 成功同步: {upstream_url}", flush=True)
-        except Exception as e:
-            print(f"  ⚠️ 同步 {upstream_url} 異常，保持現有備份", flush=True)
-
-    return list(live_sources), list(tvbox_configs)
-
-def extract_tvbox_lives(target_url, visited=None):
-    if visited is None:
-        visited = set()
-
-    real_url = encode_punycode_url(target_url)
-    if real_url in visited:
-        return []
-    visited.add(real_url)
-
-    live_urls = []
+def fetch_raw_content(url: str, timeout: int = 10) -> str:
+    """發起 HTTP 請求並自動獲取解碼文本"""
+    safe_url = clean_and_encode_url(url)
     try:
-        r = requests.get(real_url, headers=HEADERS, timeout=8)
-        if r.status_code != 200:
-            return []
-        
-        text = r.text.strip()
-        if text.startswith('**') or not (text.startswith('{') or text.startswith('[')):
-            clean_b64 = re.sub(r'[^A-Za-z0-9+/=]', '', text)
-            try:
-                decoded = base64.b64decode(clean_b64).decode('utf-8', errors='ignore')
-                if '{' in decoded:
-                    text = decoded[decoded.find('{'):decoded.rfind('}')+1]
-            except Exception:
-                pass
+        r = requests.get(safe_url, headers=HEADERS, timeout=timeout)
+        r.encoding = 'utf-8'
+        if r.status_code == 200:
+            return r.text
+    except Exception:
+        pass
+    return ""
 
-        data = json.loads(text)
-        if isinstance(data, dict):
-            if 'lives' in data and isinstance(data['lives'], list):
-                for item in data['lives']:
-                    if isinstance(item, dict):
-                        l_url = item.get('url')
-                        if l_url and isinstance(l_url, str) and l_url.startswith('http'):
-                            live_urls.append(normalize_github_raw(l_url))
-            if 'urls' in data and isinstance(data['urls'], list):
-                for sub_item in data['urls']:
-                    if isinstance(sub_item, dict) and 'url' in sub_item:
-                        sub_url = sub_item['url']
-                        if sub_url.startswith('http') and len(visited) < 25:
-                            live_urls.extend(extract_tvbox_lives(sub_url, visited))
+def parse_tvbox_payload(text: str) -> dict:
+    """自動識別並解析 TVBox 配置 (支援純 JSON 與 Base64 / PNG 偽裝)"""
+    text = text.strip()
+    if not text:
+        return {}
+    
+    # 嘗試直接解析 JSON
+    try:
+        if text.startswith('{') or text.startswith('['):
+            return json.loads(text)
     except Exception:
         pass
 
-    return list(set(live_urls))
+    # 嘗試 Base64 解碼 (處理 ** 開頭或 .png 偽裝文件)
+    try:
+        clean_b64 = re.sub(r'[^A-Za-z0-9+/=]', '', text)
+        decoded = base64.b64decode(clean_b64).decode('utf-8', errors='ignore')
+        if '{' in decoded:
+            json_str = decoded[decoded.find('{'):decoded.rfind('}')+1]
+            return json.loads(json_str)
+    except Exception:
+        pass
+
+    return {}
+
+def extract_from_tvbox(target_url: str, visited: set = None, depth: int = 0) -> list:
+    """
+    遞迴提取 TVBox 單倉與多倉內的所有直播源 (lives)
+    """
+    if visited is None:
+        visited = set()
+    if depth > 3:  # 限制多倉遞迴深度，避免死循環
+        return []
+
+    safe_url = clean_and_encode_url(target_url)
+    if safe_url in visited:
+        return []
+    visited.add(safe_url)
+
+    extracted_live_urls = []
+    text = fetch_raw_content(safe_url, timeout=8)
+    if not text:
+        return []
+
+    # 檢查是否本身就是直連 M3U/TXT 播放列表
+    if '#EXTM3U' in text or any(',' in l and 'http' in l for l in text.split('\n')[:10]):
+        return [safe_url]
+
+    data = parse_tvbox_payload(text)
+    if not isinstance(data, dict):
+        return []
+
+    # 1. 提取單倉 lives 節點
+    if 'lives' in data and isinstance(data['lives'], list):
+        for item in data['lives']:
+            if isinstance(item, dict):
+                l_url = item.get('url')
+                if l_url and isinstance(l_url, str) and l_url.startswith('http'):
+                    extracted_live_urls.append(clean_and_encode_url(l_url))
+                elif 'channels' in item and isinstance(item['channels'], list):
+                    for sub in item['channels']:
+                        for u in sub.get('urls', []):
+                            if isinstance(u, str) and u.startswith('http'):
+                                extracted_live_urls.append(clean_and_encode_url(u))
+
+    # 2. 遞迴提取多倉 urls 節點
+    if 'urls' in data and isinstance(data['urls'], list):
+        for sub_item in data['urls']:
+            if isinstance(sub_item, dict) and 'url' in sub_item:
+                sub_url = sub_item['url']
+                if isinstance(sub_url, str) and sub_url.startswith('http'):
+                    extracted_live_urls.extend(extract_from_tvbox(sub_url, visited, depth + 1))
+
+    return list(set(extracted_live_urls))
+
+# --- 4. 動態解析兩個目標 README.md ---
+
+def extract_all_sources_from_readmes() -> list:
+    """
+    從兩個目標 README.md 中萃取所有單倉、多倉與直連直播清單
+    """
+    print("🌐 開始動態抓取目標 README.md...", flush=True)
+    all_extracted_playlists = set()
+    candidate_urls = set()
+
+    for readme_url in TARGET_README_URLS:
+        print(f"  -> 正在讀取: {readme_url}", flush=True)
+        content = fetch_raw_content(readme_url, timeout=12)
+        if not content:
+            print(f"     ⚠️ 讀取失敗或內容為空: {readme_url}", flush=True)
+            continue
+
+        # 正則匹配所有 http/https 鏈接 (自動過濾註釋與行尾文字)
+        found_urls = re.findall(r'https?://[^\s#<>"\']+', content)
+        for u in found_urls:
+            u = u.strip()
+            # 排除非源鏈接
+            if any(ext in u.lower() for ext in ['.apk', '.exe', '.zip', 'shields.io', 'github.com/youhunwl', 'github.com/ngo5']):
+                continue
+            candidate_urls.add(u)
+
+    print(f"🔍 從 README 中獲取到 {len(candidate_urls)} 個候選接口，開始深入解析單倉/多倉與直播源...", flush=True)
+
+    # 並行解析所有候選接口
+    def process_candidate(url):
+        results = []
+        lower_url = url.lower()
+        # 明確的直連直播源副檔名
+        if any(lower_url.endswith(ext) for ext in ['.m3u', '.m3u8', '.txt']) and 'dc.txt' not in lower_url:
+            results.append(clean_and_encode_url(url))
+        else:
+            # 單倉、多倉接口 (JSON/Base64/無副檔名)
+            lives = extract_from_tvbox(url)
+            results.extend(lives)
+        return results
+
+    with ThreadPoolExecutor(max_workers=15) as executor:
+        futures = [executor.submit(process_candidate, u) for u in candidate_urls]
+        for f in as_completed(futures):
+            try:
+                res = f.result()
+                all_extracted_playlists.update(res)
+            except Exception:
+                pass
+
+    final_sources = list(all_extracted_playlists)
+    print(f"✅ 深度挖掘完成！共解析出 {len(final_sources)} 個有效直播源清單。", flush=True)
+    return final_sources
 
 # --- 5. ffprobe 真機解碼級驗證 ---
 
-def check_stream_with_ffprobe(url, timeout=5):
+def check_stream_with_ffprobe(url: str, timeout: int = 5) -> bool:
     cmd = [
         'ffprobe',
         '-v', 'error',
@@ -219,7 +245,7 @@ def check_stream_with_ffprobe(url, timeout=5):
     except Exception:
         return False
 
-def fast_pre_filter(url, timeout=3):
+def fast_pre_filter(url: str, timeout: int = 3) -> bool:
     try:
         r = requests.get(url, headers=HEADERS, timeout=timeout, stream=True)
         if r.status_code != 200:
@@ -237,7 +263,7 @@ def fast_pre_filter(url, timeout=3):
     except Exception:
         return False
 
-def verify_single_channel(ch):
+def verify_single_channel(ch: dict) -> tuple:
     url = ch['url']
     if any(domain in url for domain in ['rthk.hk', 'akamaized.net']):
         return ch, True
@@ -246,9 +272,9 @@ def verify_single_channel(ch):
     is_playable = check_stream_with_ffprobe(url, timeout=5)
     return ch, is_playable
 
-def check_channels_parallel(channels, max_workers=10):
+def check_channels_parallel(channels: list, max_workers: int = 10) -> list:
     valid_channels = []
-    print(f"🔍 開始對 {len(channels)} 個候選源進行【ffprobe 真機解碼級驗證】...", flush=True)
+    print(f"\n🔍 開始對 {len(channels)} 個候選源進行【ffprobe 真機解碼級驗證】...", flush=True)
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = [executor.submit(verify_single_channel, ch) for ch in channels]
         for f in as_completed(futures):
@@ -260,83 +286,75 @@ def check_channels_parallel(channels, max_workers=10):
                 print(f"  🔴 [不可播/假源]: {ch['name']}", flush=True)
     return valid_channels
 
-def get_sort_key(item):
+def get_sort_key(item: dict) -> int:
     name = item["name"]
     for index, keyword in enumerate(ORDER_KEYWORDS):
         if keyword.lower() in name.lower():
             return index
     return 999
 
-# --- 6. 主流程 ---
+# --- 6. 核心排程執行邏輯 ---
 
-def fetch_and_parse():
+def fetch_and_parse() -> list:
     found_channels = []
     seen_urls = set()
 
-    dynamic_sources, dynamic_configs = sync_from_upstream_aggregators()
-    for conf in dynamic_configs:
-        extracted = extract_tvbox_lives(conf)
-        if extracted:
-            dynamic_sources.extend(extracted)
+    # 1. 唯一來源：動態解析兩個目標 README.md
+    playlist_sources = extract_all_sources_from_readmes()
+    print(f"🚀 開始逐一檢索各清單中的香港電視頻道...", flush=True)
 
-    dynamic_sources = list(set([normalize_github_raw(s) for s in dynamic_sources]))
-    print(f"🚀 清單彙整完畢，共獲取 {len(dynamic_sources)} 個列表，開始檢索香港電視頻道...", flush=True)
-
-    for index, source in enumerate(dynamic_sources):
-        try:
-            r = requests.get(encode_punycode_url(source), headers=HEADERS, timeout=8)
-            r.encoding = 'utf-8'
-            if r.status_code != 200:
-                continue
-
-            lines = [l.strip() for l in r.text.split('\n') if l.strip()]
-            current_name = ""
-            count_added = 0
-            is_m3u = any(line.startswith('#EXTM3U') or line.startswith('#EXTINF') for line in lines[:10])
-
-            for line in lines:
-                if is_m3u:
-                    if line.startswith("#EXTINF"):
-                        match = re.search(r',(.+)$', line)
-                        if match:
-                            raw_name = match.group(1).strip()
-                            current_name = cc.convert(raw_name).replace('臺', '台')
-                    elif line.startswith("http"):
-                        stream_url = line.split('$')[0].strip()
-                        if current_name:
-                            if any(b.lower() in current_name.lower() for b in BLOCK_KEYWORDS):
-                                current_name = ""
-                                continue
-                            if any(k.lower() in current_name.lower() for k in KEYWORDS):
-                                if stream_url not in seen_urls:
-                                    seen_urls.add(stream_url)
-                                    found_channels.append({"name": current_name, "url": stream_url})
-                                    count_added += 1
-                        current_name = ""
-                else:
-                    if ',' in line and not line.startswith('http'):
-                        parts = line.split(',', 1)
-                        if len(parts) == 2:
-                            name_part = cc.convert(parts[0].strip()).replace('臺', '台')
-                            url_part = parts[1].split('$')[0].strip()
-                            if url_part.startswith('http'):
-                                if any(b.lower() in name_part.lower() for b in BLOCK_KEYWORDS):
-                                    continue
-                                if any(k.lower() in name_part.lower() for k in KEYWORDS):
-                                    if url_part not in seen_urls:
-                                        seen_urls.add(url_part)
-                                        found_channels.append({"name": name_part, "url": url_part})
-                                        count_added += 1
-
-            if count_added > 0:
-                print(f"  [{index+1}/{len(dynamic_sources)}] 提取到 {count_added} 個候選頻道", flush=True)
-
-        except Exception:
+    # 2. 下載並解析每個 M3U/TXT 列表
+    for index, source in enumerate(playlist_sources):
+        content = fetch_raw_content(source, timeout=8)
+        if not content:
             continue
+
+        lines = [l.strip() for l in content.split('\n') if l.strip()]
+        current_name = ""
+        count_added = 0
+        is_m3u = any(line.startswith('#EXTM3U') or line.startswith('#EXTINF') for line in lines[:10])
+
+        for line in lines:
+            if is_m3u:
+                if line.startswith("#EXTINF"):
+                    match = re.search(r',(.+)$', line)
+                    if match:
+                        raw_name = match.group(1).strip()
+                        current_name = cc.convert(raw_name).replace('臺', '台')
+                elif line.startswith("http"):
+                    stream_url = line.split('$')[0].strip()
+                    if current_name:
+                        if any(b.lower() in current_name.lower() for b in BLOCK_KEYWORDS):
+                            current_name = ""
+                            continue
+                        if any(k.lower() in current_name.lower() for k in KEYWORDS):
+                            if stream_url not in seen_urls:
+                                seen_urls.add(stream_url)
+                                found_channels.append({"name": current_name, "url": stream_url})
+                                count_added += 1
+                    current_name = ""
+            else:
+                if ',' in line and not line.startswith('http'):
+                    parts = line.split(',', 1)
+                    if len(parts) == 2:
+                        name_part = cc.convert(parts[0].strip()).replace('臺', '台')
+                        url_part = parts[1].split('$')[0].strip()
+                        if url_part.startswith('http'):
+                            if any(b.lower() in name_part.lower() for b in BLOCK_KEYWORDS):
+                                continue
+                            if any(k.lower() in name_part.lower() for k in KEYWORDS):
+                                if url_part not in seen_urls:
+                                    seen_urls.add(url_part)
+                                    found_channels.append({"name": name_part, "url": url_part})
+                                    count_added += 1
+
+        if count_added > 0:
+            print(f"  [{index+1}/{len(playlist_sources)}] 提取到 {count_added} 個香港候選頻道", flush=True)
 
     return found_channels
 
-def generate_m3u(channels):
+def generate_m3u(channels: list):
+    # 進行真機解碼篩選
     tested_channels = check_channels_parallel(channels)
 
     final_dict = {}
@@ -362,11 +380,170 @@ def generate_m3u(channels):
     with open("hk_live.m3u", "w", encoding="utf-8") as f:
         f.write(content)
 
-    print(f"\n🎉 驗證完成！共篩選出 {len(final_list)} 個實質可解碼播放的優質頻道。", flush=True)
+    print(f"\n🎉 驗證完成！共篩選出 {len(final_list)} 個實質可解碼播放的優質香港電視頻道。", flush=True)
 
 if __name__ == "__main__":
     candidates = fetch_and_parse()
     generate_m3u(candidates)
+
+````
+
+## File: .github/workflows/main.yml
+````yml
+name: Update IPTV Source
+
+on:
+  schedule:
+    # 每天香港時間 08:00 和 20:00 運行 (UTC 00:00, 12:00)
+    - cron: '0 0,12 * * *'
+  workflow_dispatch: # 允許手動點擊按鈕
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run script
+      run: python main.py
+
+    - name: Commit and push
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add hk_live.m3u
+        git commit -m "Auto-update channel list" || echo "No changes to commit"
+        git push
+
+````
+
+## File: .github/workflows/combine-code.yml
+````yml
+name: Generate All Codebase to MD
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'combined_project_code.md' # 避免此檔案自身更新引發無限循環
+  workflow_dispatch: # 支援在 GitHub 網頁上手動觸發執行
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Combine All Files into MD
+        run: |
+          OUT_FILE="combined_project_code.md"
+          echo "# Complete Project Codebase" > "$OUT_FILE"
+          echo "Generated on: $(date)" >> "$OUT_FILE"
+          echo "" >> "$OUT_FILE"
+
+          # 遍歷專案內的所有檔案，排除依賴、Git 歷史、打包產物及二進位檔案
+          find . -type f \
+            -not -path "*/node_modules/*" \
+            -not -path "*/.git/*" \
+            -not -path "*/dist/*" \
+            -not -name "package-lock.json" \
+            -not -name "yarn.lock" \
+            -not -name "pnpm-lock.yaml" \
+            -not -name "$OUT_FILE" \
+            -not -name "*.png" \
+            -not -name "*.jpg" \
+            -not -name "*.jpeg" \
+            -not -name "*.gif" \
+            -not -name "*.ico" \
+            -not -name "*.woff*" \
+            -not -name "*.ttf" | while read -r file; do
+              
+              # 取得相對路徑與副檔名
+              rel_path="${file#./}"
+              ext="${file##*.}"
+              
+              # 如果無副檔名，清除變數避免格式混亂
+              if [ "$ext" = "$rel_path" ]; then
+                ext=""
+              fi
+              
+              # 寫入檔案標題
+              echo "## File: $rel_path" >> "$OUT_FILE"
+              # 使用四個反單引號（````）包裹，防止內部程式碼的三個反單引號造成排版衝突
+              echo "\`\`\`\`$ext" >> "$OUT_FILE"
+              cat "$file" >> "$OUT_FILE"
+              echo "" >> "$OUT_FILE"
+              echo "\`\`\`\`" >> "$OUT_FILE"
+              echo "" >> "$OUT_FILE"
+          done
+
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add combined_project_code.md
+          
+          if git diff --staged --quiet; then
+            echo "No changes in codebase."
+          else
+            git commit -m "docs: auto-generate complete codebase [skip ci]"
+            git push origin main
+          fi
+
+````
+
+## File: hk_live.m3u
+````m3u
+#EXTM3U x-tvg-url="https://epg.112114.xyz/pp.xml"
+# Update: 2026-09-24 03:38:30
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視31.png",港台電視31
+#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+https://rthktv31-live.akamaized.net/hls/live/2036818/RTHKTV31/master.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視32.png",港台電視32
+#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+https://rthktv32-live.akamaized.net/hls/live/2036819/RTHKTV32/master.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK32.png",RTHK32
+#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+http://rthktv32-live.akamaized.net/hls/live/2036819/RTHKTV32/master.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 33 (1080p) [Geo-blocked].png",RTHK TV 33 (1080p) [Geo-blocked]
+#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+https://rthktv33-live.akamaized.net/hls/live/2101641/RTHKTV33/master.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 34 (1080p) [Geo-blocked].png",RTHK TV 34 (1080p) [Geo-blocked]
+#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+https://rthktv34-live.akamaized.net/hls/live/2101642/RTHKTV34/master.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 35 (1080p) [Geo-blocked].png",RTHK TV 35 (1080p) [Geo-blocked]
+#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+https://rthktv35-live.akamaized.net/hls/live/2101643/RTHKTV35/master.m3u8
+#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 36 (港台電視36) (1080p) [Geo-blocked].png",RTHK TV 36 (港台電視36) (1080p) [Geo-blocked]
+#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
+https://rthktv36-live.akamaized.net/hls/live/2112176/RTHKTV36/master.m3u8
+
+````
+
+## File: requirements.txt
+````txt
+requests
+opencc-python-reimplemented
+m3u8
 
 ````
 
@@ -480,157 +657,6 @@ Fork 本項目後，GitHub Actions 默認是關閉的。你需要：
 4.  **地區限制**: 部分源（如 RTHK、HOY TV 官方直連）設有 Geo-block，需使用香港本地網絡或香港網絡節點觀看。
 
 **Last Update:** 每天自動更新
-
-````
-
-## File: hk_live.m3u
-````m3u
-#EXTM3U x-tvg-url="https://epg.112114.xyz/pp.xml"
-# Update: 2026-09-23 16:54:47
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視31.png",港台電視31
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-https://rthktv31-live.akamaized.net/hls/live/2036818/RTHKTV31/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/港台電視32.png",港台電視32
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-https://rthktv32-live.akamaized.net/hls/live/2036819/RTHKTV32/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK32.png",RTHK32
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-http://rthktv32-live.akamaized.net/hls/live/2036819/RTHKTV32/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 33 (1080p) [Geo-blocked].png",RTHK TV 33 (1080p) [Geo-blocked]
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-https://rthktv33-live.akamaized.net/hls/live/2101641/RTHKTV33/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 35 (1080p) [Geo-blocked].png",RTHK TV 35 (1080p) [Geo-blocked]
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-https://rthktv35-live.akamaized.net/hls/live/2101643/RTHKTV35/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 34 (1080p) [Geo-blocked].png",RTHK TV 34 (1080p) [Geo-blocked]
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-https://rthktv34-live.akamaized.net/hls/live/2101642/RTHKTV34/master.m3u8
-#EXTINF:-1 group-title="Hong Kong" logo="https://epg.112114.xyz/logo/RTHK TV 36 (港台電視36) (1080p) [Geo-blocked].png",RTHK TV 36 (港台電視36) (1080p) [Geo-blocked]
-#EXTVLCOPT:http-user-agent=okhttp/3.15.0 (Linux; Android 11; TVBox)
-https://rthktv36-live.akamaized.net/hls/live/2112176/RTHKTV36/master.m3u8
-
-````
-
-## File: .github/workflows/combine-code.yml
-````yml
-name: Generate All Codebase to MD
-
-on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'combined_project_code.md' # 避免此檔案自身更新引發無限循環
-  workflow_dispatch: # 支援在 GitHub 網頁上手動觸發執行
-
-permissions:
-  contents: write
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Combine All Files into MD
-        run: |
-          OUT_FILE="combined_project_code.md"
-          echo "# Complete Project Codebase" > "$OUT_FILE"
-          echo "Generated on: $(date)" >> "$OUT_FILE"
-          echo "" >> "$OUT_FILE"
-
-          # 遍歷專案內的所有檔案，排除依賴、Git 歷史、打包產物及二進位檔案
-          find . -type f \
-            -not -path "*/node_modules/*" \
-            -not -path "*/.git/*" \
-            -not -path "*/dist/*" \
-            -not -name "package-lock.json" \
-            -not -name "yarn.lock" \
-            -not -name "pnpm-lock.yaml" \
-            -not -name "$OUT_FILE" \
-            -not -name "*.png" \
-            -not -name "*.jpg" \
-            -not -name "*.jpeg" \
-            -not -name "*.gif" \
-            -not -name "*.ico" \
-            -not -name "*.woff*" \
-            -not -name "*.ttf" | while read -r file; do
-              
-              # 取得相對路徑與副檔名
-              rel_path="${file#./}"
-              ext="${file##*.}"
-              
-              # 如果無副檔名，清除變數避免格式混亂
-              if [ "$ext" = "$rel_path" ]; then
-                ext=""
-              fi
-              
-              # 寫入檔案標題
-              echo "## File: $rel_path" >> "$OUT_FILE"
-              # 使用四個反單引號（````）包裹，防止內部程式碼的三個反單引號造成排版衝突
-              echo "\`\`\`\`$ext" >> "$OUT_FILE"
-              cat "$file" >> "$OUT_FILE"
-              echo "" >> "$OUT_FILE"
-              echo "\`\`\`\`" >> "$OUT_FILE"
-              echo "" >> "$OUT_FILE"
-          done
-
-      - name: Commit and Push changes
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add combined_project_code.md
-          
-          if git diff --staged --quiet; then
-            echo "No changes in codebase."
-          else
-            git commit -m "docs: auto-generate complete codebase [skip ci]"
-            git push origin main
-          fi
-
-````
-
-## File: .github/workflows/main.yml
-````yml
-name: Update IPTV Source
-
-on:
-  schedule:
-    # 每天香港時間 08:00 和 20:00 運行 (UTC 00:00, 12:00)
-    - cron: '0 0,12 * * *'
-  workflow_dispatch: # 允許手動點擊按鈕
-
-permissions:
-  contents: write
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-
-    - name: Install dependencies
-      run: pip install -r requirements.txt
-
-    - name: Run script
-      run: python main.py
-
-    - name: Commit and push
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add hk_live.m3u
-        git commit -m "Auto-update channel list" || echo "No changes to commit"
-        git push
 
 ````
 
