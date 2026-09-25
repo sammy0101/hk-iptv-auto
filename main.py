@@ -20,7 +20,6 @@ HEADERS = {
 }
 
 # --- 1. Guovin 風格頻道別名對照表 (Alias Normalization) ---
-# 將網路抓到的各種混亂名稱自動校正為標準名稱
 CHANNEL_ALIASES = {
     "翡翠台": ["翡翠台", "tvb翡翠台", "翡翠", "jade", "翡翠台 1080p", "翡翠台 4k", "tvb 翡翠台", "tvb-翡翠台"],
     "無綫新聞台": ["無綫新聞台", "無線新聞台", "無綫新聞", "無線新聞", "tvb新聞", "tvb無綫新聞", "inews", "無綫新聞台 1080p"],
@@ -38,7 +37,7 @@ CHANNEL_ALIASES = {
     "有線新聞台": ["有線新聞台", "有线新闻台", "有線新聞", "有线新闻", "香港有線新聞"]
 }
 
-# 最終輸出的頻道順序 (按照香港人習慣排列)
+# 最終輸出的頻道順序 (按照香港收視習慣)
 ORDER_KEYWORDS = [
     "翡翠台", "無綫新聞台", "明珠台", "TVB Plus", "無綫財經體育資訊台",
     "ViuTV", "ViuTVsix",
@@ -47,16 +46,16 @@ ORDER_KEYWORDS = [
     "Now新聞台", "Now直播台", "有線新聞台"
 ]
 
-# 每個頻道最多保留測速最快的前 N 條優質線路 (避免 MoonTV 載入過多無效備份)
+# 每個頻道保留測速最快的前 N 條線路
 MAX_URLS_PER_CHANNEL = 4
 
-# 香港官方高保真源 (在香港本地必通，給予優先權重)
+# 香港官方高保真源保底
 OFFICIAL_CHANNELS = [
     {"name": "港台電視31", "url": "https://rthktv31-live.akamaized.net/hls/live/2036818/RTHKTV31/master.m3u8"},
     {"name": "港台電視32", "url": "https://rthktv32-live.akamaized.net/hls/live/2036819/RTHKTV32/master.m3u8"}
 ]
 
-# 上游導航大庫清單
+# 上游導航大庫清單 (動態解碼單倉/多倉)
 TARGET_README_URLS = [
     "https://raw.githubusercontent.com/youhunwl/TVAPP/main/README.md",
     "https://raw.githubusercontent.com/ngo5/IPTV/main/README.md",
@@ -66,13 +65,19 @@ TARGET_README_URLS = [
     "https://raw.githubusercontent.com/Newtxin/TVBoxSource/main/README.md"
 ]
 
-# 高頻直連香港庫
+# 高頻直連清單 (已加入 iptv-org 全球總匯庫)
 SPECIFIC_HK_DIRECT_SOURCES = [
+    # iptv-org 全球總匯庫 (新增) 與香港分區庫
+    "https://iptv-org.github.io/iptv/index.m3u",
     "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/hk.m3u",
+    
+    # 國際與專屬分區
     "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlists/playlist_hong_kong.m3u8",
     "https://raw.githubusercontent.com/s14685/tv/main/iptvhk.txt",
     "https://raw.githubusercontent.com/hujingguang/ChinaIPTV/main/HongKong.m3u8",
     "https://epg.pw/test_channels_hong_kong.m3u",
+    
+    # 社群大佬高頻維護源
     "https://raw.githubusercontent.com/fanmingming/live/main/tv/m3u/ipv6.m3u",
     "https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.m3u",
     "https://raw.githubusercontent.com/suxuang/myIPTV/main/ipv4.m3u",
@@ -114,7 +119,7 @@ def clean_and_encode_url(url: str) -> str:
     except Exception:
         return url
 
-def fetch_raw_content(url: str, timeout: int = 10) -> str:
+def fetch_raw_content(url: str, timeout: int = 15) -> str:
     safe_url = clean_and_encode_url(url)
     try:
         r = requests.get(safe_url, headers=HEADERS, timeout=timeout)
@@ -223,19 +228,11 @@ def extract_all_sources() -> list:
     print(f"✅ 全部分析完畢！共聚合出 {len(final_sources)} 個直播源清單。", flush=True)
     return final_sources
 
-# --- 3. Guovin/iptv-api 核心測速與切片驗效技術 (Speed & Delay Test) ---
+# --- 3. Guovin/iptv-api 測速與分片驗證引擎 ---
 
 def test_stream_speed(url: str, timeout: int = 5) -> tuple:
-    """
-    實裝 Guovin/iptv-api 測速引擎：
-    1. 下載完整 M3U8 (拒絕斷章截斷)
-    2. 穿透多碼率 Playlist，提取真實視頻切片 (.ts / .m4s)
-    3. 實時測量 首包延遲 (Delay, ms) 與 下載吞吐速率 (Speed, MB/s)
-    4. 自動識別並過濾廣告 / 無信號循環源
-    """
     safe_url = clean_and_encode_url(url)
     
-    # 港台官方 Akamai CDN 保護放行
     if any(d in safe_url.lower() for d in ['rthk.hk', 'akamaized.net']):
         return True, 5.0, 50.0
 
@@ -246,18 +243,14 @@ def test_stream_speed(url: str, timeout: int = 5) -> tuple:
             return False, 0, float('inf')
         
         text = r.text
-        # 如果不是 M3U8，直接測試首字節下載
         if '#EXTM3U' not in text:
-            # 針對直接返回 TS/FLV 流的接口
             delay = (time.time() - t_start) * 1000
             speed = len(r.content) / (1024 * 1024) / max((time.time() - t_start), 0.001)
             return len(r.content) > 1024, speed, delay
 
-        # 解析 M3U8 尋找真實視頻切片
         parsed = m3u8.loads(text)
         target_seg_url = None
 
-        # 多碼率 Master Playlist 穿透
         if parsed.is_variant and parsed.playlists:
             sub_url = urljoin(safe_url, parsed.playlists[0].uri)
             sub_r = requests.get(sub_url, headers=HEADERS, timeout=timeout)
@@ -268,7 +261,6 @@ def test_stream_speed(url: str, timeout: int = 5) -> tuple:
         elif parsed.segments:
             target_seg_url = urljoin(safe_url, parsed.segments[0].uri)
         else:
-            # 正則備用語法 (兼容非標準 M3U8)
             lines = [l.strip() for l in text.split('\n') if l.strip() and not l.startswith('#')]
             if lines:
                 target_seg_url = urljoin(safe_url, lines[0])
@@ -276,7 +268,6 @@ def test_stream_speed(url: str, timeout: int = 5) -> tuple:
         if not target_seg_url:
             return False, 0, float('inf')
 
-        # 實測視頻分片傳輸速度
         t_seg_start = time.time()
         seg_res = requests.get(target_seg_url, headers=HEADERS, timeout=timeout, stream=True)
         if seg_res.status_code != 200:
@@ -288,7 +279,6 @@ def test_stream_speed(url: str, timeout: int = 5) -> tuple:
 
         for chunk in seg_res.iter_content(chunk_size=32768):
             bytes_read += len(chunk)
-            # 讀取約 256KB 數據即完成測速 (兼顧速度與準確度)
             if bytes_read >= 256 * 1024 or (time.time() - t_download_start) >= 2.5:
                 break
         seg_res.close()
@@ -296,7 +286,6 @@ def test_stream_speed(url: str, timeout: int = 5) -> tuple:
         elapsed = time.time() - t_download_start
         speed = (bytes_read / (1024 * 1024)) / max(elapsed, 0.001)
 
-        # 必須能成功拉取至少 40KB 二進位視頻才視為活源
         is_alive = bytes_read >= 40 * 1024
         return is_alive, speed, delay
 
@@ -304,7 +293,6 @@ def test_stream_speed(url: str, timeout: int = 5) -> tuple:
         return False, 0, float('inf')
 
 def match_standard_channel_name(raw_name: str) -> str:
-    """根據 Guovin 頻識別名表，精確匹配並歸一化為標準名稱"""
     clean_n = raw_name.lower().replace(" ", "").replace("-", "")
     for std_name, aliases in CHANNEL_ALIASES.items():
         for a in aliases:
@@ -314,7 +302,7 @@ def match_standard_channel_name(raw_name: str) -> str:
 
 def parse_single_playlist(source_url: str) -> list:
     channels = []
-    content = fetch_raw_content(source_url, timeout=8)
+    content = fetch_raw_content(source_url, timeout=12)
     if not content:
         return channels
 
@@ -377,7 +365,6 @@ def fetch_and_parse() -> list:
 def generate_m3u(channels: list):
     print(f"\n⚡ 正在啟動【Guovin 測速引擎】：實測下載速率 (Speed) 與 延遲 (Delay)...", flush=True)
     
-    # 1. 並行測速
     channel_test_results = {}
     
     def test_worker(ch):
@@ -403,10 +390,9 @@ def generate_m3u(channels: list):
             else:
                 print(f"  🔴 [不可播/逾時] {c_name}", flush=True)
 
-    # 2. Guovin 核心排序與 Top-K 篩選策略
     final_list = []
     
-    # 加入官方保底源
+    # 官方保底源優先置頂
     for off in OFFICIAL_CHANNELS:
         final_list.append(off)
 
@@ -415,25 +401,22 @@ def generate_m3u(channels: list):
         if not candidates:
             continue
         
-        # 按照 Guovin 策略：下載速率高優先 (speed desc)，延遲低優先 (delay asc)
+        # Guovin 排序策略：速率快優先，延遲低優先
         candidates.sort(key=lambda x: (-x['speed'], x['delay']))
         
         # 每個頻道精選前 MAX_URLS_PER_CHANNEL 條最快線路
         selected = candidates[:MAX_URLS_PER_CHANNEL]
         for item in selected:
-            # 避免重複加入官方源
             if not any(f['url'] == item['url'] for f in final_list):
                 final_list.append(item)
 
-    # 3. 輸出嚴格雙行 MoonTV / TiviMate 標準格式
+    # 輸出嚴格雙行 MoonTV / TiviMate 標準格式
     lines = ['#EXTM3U x-tvg-url="https://epg.112114.xyz/pp.xml" url-tvg="https://epg.112114.xyz/pp.xml"']
 
     for item in final_list:
         name = item["name"]
         logo_url = f"https://epg.112114.xyz/logo/{name}.png"
-        # 第 1 行：標準信息
         lines.append(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo_url}" group-title="Hong Kong",{name}')
-        # 第 2 行：串流 URL (完全緊貼)
         lines.append(f'{item["url"]}')
 
     content = "\n".join(lines) + "\n"
