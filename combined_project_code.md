@@ -1,5 +1,5 @@
 # Complete Project Codebase
-Generated on: Fri Sep 25 15:41:05 UTC 2026
+Generated on: Fri Sep 25 15:54:06 UTC 2026
 
 ## File: main.py
 ````py
@@ -16,7 +16,6 @@ import m3u8
 
 cc = OpenCC('s2t')
 
-# 模擬標準 Android TV 播放器標頭
 IPTV_UA = 'okhttp/3.15.0 (Linux; Android 11; TVBox)'
 HEADERS = {
     'User-Agent': IPTV_UA,
@@ -24,22 +23,57 @@ HEADERS = {
     'Connection': 'keep-alive'
 }
 
-# --- 1. Guovin 風格頻道別名對照表 (Alias Normalization) ---
+# --- 1. 強化版香港頻道別名表 (含全套國際庫英文別名，避免漏抓) ---
 CHANNEL_ALIASES = {
-    "翡翠台": ["翡翠台", "tvb翡翠台", "翡翠", "jade", "翡翠台 1080p", "翡翠台 4k", "tvb 翡翠台", "tvb-翡翠台"],
-    "無綫新聞台": ["無綫新聞台", "無線新聞台", "無綫新聞", "無線新聞", "tvb新聞", "tvb無綫新聞", "inews", "無綫新聞台 1080p"],
-    "明珠台": ["明珠台", "tvb明珠台", "明珠", "pearl", "tvb 明珠台", "tvb-明珠台"],
-    "TVB Plus": ["tvb plus", "j2", "j5", "tvbplus"],
-    "無綫財經體育資訊台": ["無綫財經體育資訊台", "無線財經體育資訊台", "無綫財經", "無線財經", "財經體育資訊台", "無綫財經台"],
-    "ViuTV": ["viutv", "viu tv", "viutv 99", "viu99", "99台"],
-    "ViuTVsix": ["viutvsix", "viutv 6", "viutv6", "viu6", "96台", "viutv 96"],
-    "HOY TV": ["hoy tv", "hoytv", "奇妙電視", "香港開電視", "77台", "hoy tv 77"],
-    "HOY 資訊台": ["hoy 資訊台", "hoy 资讯台", "hoy資訊台", "hoy78", "78台"],
-    "港台電視31": ["港台電視31", "港台电视31", "rthk 31", "rthk31", "港台31", "香港電台31"],
-    "港台電視32": ["港台電視32", "港台电视32", "rthk 32", "rthk32", "港台32", "香港電台32"],
-    "Now新聞台": ["now新聞台", "now新闻台", "now新聞", "now新闻", "now 332", "now tv 新聞"],
-    "Now直播台": ["now直播台", "now直播", "now 331", "now tv 直播"],
-    "有線新聞台": ["有線新聞台", "有线新闻台", "有線新聞", "有线新闻", "香港有線新聞"]
+    "翡翠台": [
+        "翡翠台", "tvb翡翠台", "翡翠", "jade", "tvb jade", "tvb-jade",
+        "翡翠台 1080p", "翡翠台 4k", "tvb 翡翠台"
+    ],
+    "無綫新聞台": [
+        "無綫新聞台", "無線新聞台", "無綫新聞", "無線新聞", "tvb新聞", "tvb無綫新聞",
+        "tvb news", "tvb-news", "inews", "無綫新聞台 1080p", "tvb news channel"
+    ],
+    "明珠台": [
+        "明珠台", "tvb明珠台", "明珠", "pearl", "tvb pearl", "tvb-pearl", "tvb 明珠台"
+    ],
+    "TVB Plus": [
+        "tvb plus", "tvbplus", "j2", "j5", "tvb j2"
+    ],
+    "無綫財經體育資訊台": [
+        "無綫財經體育資訊台", "無線財經體育資訊台", "無綫財經", "無線財經",
+        "財經體育資訊台", "無綫財經台", "tvb finance"
+    ],
+    "ViuTV": [
+        "viutv", "viu tv", "viutv 99", "viu99", "99台", "viu tv 99"
+    ],
+    "ViuTVsix": [
+        "viutvsix", "viutv 6", "viutv6", "viu6", "96台", "viutv 96", "viu tv six"
+    ],
+    "HOY TV": [
+        "hoy tv", "hoytv", "奇妙電視", "香港開電視", "77台", "hoy tv 77", "fantastic tv", "open tv"
+    ],
+    "HOY 資訊台": [
+        "hoy 資訊台", "hoy 资讯台", "hoy資訊台", "hoy78", "78台", "hoy info", "hoy infotainment"
+    ],
+    "港台電視31": [
+        "港台電視31", "港台电视31", "rthk 31", "rthk31", "港台31", "香港電台31",
+        "rthk tv 31", "rthktv31", "rthk tv31"
+    ],
+    "港台電視32": [
+        "港台電視32", "港台电视32", "rthk 32", "rthk32", "港台32", "香港電台32",
+        "rthk tv 32", "rthktv32", "rthk tv32"
+    ],
+    "Now新聞台": [
+        "now新聞台", "now新闻台", "now新聞", "now新闻", "now 332", "now tv 新聞",
+        "now news", "nownews", "now tv news"
+    ],
+    "Now直播台": [
+        "now直播台", "now直播", "now 331", "now tv 直播", "now live", "nowlive"
+    ],
+    "有線新聞台": [
+        "有線新聞台", "有线新闻台", "有線新聞", "有线新闻", "香港有線新聞",
+        "cable news", "cablenews", "i-cable news"
+    ]
 }
 
 # 最終輸出的頻道順序 (按照香港收視習慣)
@@ -51,16 +85,13 @@ ORDER_KEYWORDS = [
     "Now新聞台", "Now直播台", "有線新聞台"
 ]
 
-# 每個頻道保留測速最快的前 N 條線路
 MAX_URLS_PER_CHANNEL = 4
 
-# 香港官方高保真源保底
 OFFICIAL_CHANNELS = [
     {"name": "港台電視31", "url": "https://rthktv31-live.akamaized.net/hls/live/2036818/RTHKTV31/master.m3u8"},
     {"name": "港台電視32", "url": "https://rthktv32-live.akamaized.net/hls/live/2036819/RTHKTV32/master.m3u8"}
 ]
 
-# 上游導航大庫清單 (動態解碼單倉/多倉)
 TARGET_README_URLS = [
     "https://raw.githubusercontent.com/youhunwl/TVAPP/main/README.md",
     "https://raw.githubusercontent.com/ngo5/IPTV/main/README.md",
@@ -70,19 +101,14 @@ TARGET_README_URLS = [
     "https://raw.githubusercontent.com/Newtxin/TVBoxSource/main/README.md"
 ]
 
-# 高頻直連清單 (已加入 iptv-org 全球總匯庫)
+# 你指定的所有高品質直連清單
 SPECIFIC_HK_DIRECT_SOURCES = [
-    # iptv-org 全球總匯庫 (新增) 與香港分區庫
     "https://iptv-org.github.io/iptv/index.m3u",
     "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/hk.m3u",
-    
-    # 國際與專屬分區
     "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlists/playlist_hong_kong.m3u8",
     "https://raw.githubusercontent.com/s14685/tv/main/iptvhk.txt",
     "https://raw.githubusercontent.com/hujingguang/ChinaIPTV/main/HongKong.m3u8",
     "https://epg.pw/test_channels_hong_kong.m3u",
-    
-    # 社群大佬高頻維護源
     "https://raw.githubusercontent.com/fanmingming/live/main/tv/m3u/ipv6.m3u",
     "https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.m3u",
     "https://raw.githubusercontent.com/suxuang/myIPTV/main/ipv4.m3u",
@@ -205,8 +231,11 @@ def process_candidate_url(target_url: str, visited: set = None, depth: int = 0) 
 
 def extract_all_sources() -> list:
     print("🌐 開始動態提取所有上游資源...", flush=True)
-    all_extracted_playlists = set([clean_and_encode_url(u) for u in SPECIFIC_HK_DIRECT_SOURCES])
+    direct_sources_set = set([clean_and_encode_url(u) for u in SPECIFIC_HK_DIRECT_SOURCES])
+    all_extracted_playlists = set(direct_sources_set)
     candidate_urls = set()
+
+    print(f"📌 [預載成功] 已加載 {len(direct_sources_set)} 個指定高品質直連源清單", flush=True)
 
     for readme_url in TARGET_README_URLS:
         content = fetch_raw_content(readme_url, timeout=12)
@@ -219,7 +248,7 @@ def extract_all_sources() -> list:
                 continue
             candidate_urls.add(clean_u)
 
-    print(f"🔍 全網共獲取到 {len(candidate_urls)} 個候選網址，開始深入解碼...", flush=True)
+    print(f"🔍 全網導航庫共獲取到 {len(candidate_urls)} 個候選網址，開始深入解碼...", flush=True)
     with ThreadPoolExecutor(max_workers=20) as executor:
         futures = [executor.submit(process_candidate_url, u) for u in candidate_urls]
         for f in as_completed(futures):
@@ -230,10 +259,10 @@ def extract_all_sources() -> list:
                 pass
 
     final_sources = list(all_extracted_playlists)
-    print(f"✅ 全部分析完畢！共聚合出 {len(final_sources)} 個直播源清單。", flush=True)
+    print(f"✅ 全部分析完畢！共彙整出 {len(final_sources)} 個直播清單 (包含全部直連源與影視倉)。", flush=True)
     return final_sources
 
-# --- 3. Guovin/iptv-api 測速與分片驗證引擎 ---
+# --- 3. Guovin 測速與分片驗證引擎 ---
 
 def test_stream_speed(url: str, timeout: int = 5) -> tuple:
     safe_url = clean_and_encode_url(url)
@@ -307,7 +336,9 @@ def match_standard_channel_name(raw_name: str) -> str:
 
 def parse_single_playlist(source_url: str) -> list:
     channels = []
-    content = fetch_raw_content(source_url, timeout=12)
+    # 對巨型檔案給予 20 秒充足下載時間
+    timeout = 20 if "index.m3u" in source_url else 12
+    content = fetch_raw_content(source_url, timeout=timeout)
     if not content:
         return channels
 
@@ -350,17 +381,23 @@ def fetch_and_parse() -> list:
     seen_urls = set()
 
     playlist_sources = extract_all_sources()
-    print(f"🚀 開始使用 20 線程並行抓取 {len(playlist_sources)} 個清單中的香港電視頻道...", flush=True)
+    print(f"\n🚀 開始並行解析 {len(playlist_sources)} 個清單中的香港電視頻道...", flush=True)
 
     with ThreadPoolExecutor(max_workers=20) as executor:
         futures = {executor.submit(parse_single_playlist, s): s for s in playlist_sources}
         for f in as_completed(futures):
+            source_url = futures[f]
             try:
                 ch_list = f.result()
+                added = 0
                 for ch in ch_list:
                     if ch['url'] not in seen_urls:
                         seen_urls.add(ch['url'])
                         found_channels.append(ch)
+                        added += 1
+                if added > 0:
+                    tag = "【直連清單】" if any(d in source_url for d in SPECIFIC_HK_DIRECT_SOURCES) else "【影視倉源】"
+                    print(f"  ⭐ {tag} 貢獻 {added} 個有效候選香港台: {source_url}", flush=True)
             except Exception:
                 pass
 
@@ -397,7 +434,6 @@ def generate_m3u(channels: list):
 
     final_list = []
     
-    # 官方保底源優先置頂
     for off in OFFICIAL_CHANNELS:
         final_list.append(off)
 
@@ -406,16 +442,13 @@ def generate_m3u(channels: list):
         if not candidates:
             continue
         
-        # Guovin 排序策略：速率快優先，延遲低優先
         candidates.sort(key=lambda x: (-x['speed'], x['delay']))
-        
-        # 每個頻道精選前 MAX_URLS_PER_CHANNEL 條最快線路
         selected = candidates[:MAX_URLS_PER_CHANNEL]
         for item in selected:
             if not any(f['url'] == item['url'] for f in final_list):
                 final_list.append(item)
 
-    # 輸出嚴格雙行 MoonTV / TiviMate 標準格式
+    # 輸出 MoonTV / TiviMate 標準兩行格式
     lines = ['#EXTM3U x-tvg-url="https://epg.112114.xyz/pp.xml" url-tvg="https://epg.112114.xyz/pp.xml"']
 
     for item in final_list:
@@ -573,17 +606,17 @@ https://rthktv31-live.akamaized.net/hls/live/2036818/RTHKTV31/master.m3u8
 #EXTINF:-1 tvg-name="港台電視32" tvg-logo="https://epg.112114.xyz/logo/港台電視32.png" group-title="Hong Kong",港台電視32
 https://rthktv32-live.akamaized.net/hls/live/2036819/RTHKTV32/master.m3u8
 #EXTINF:-1 tvg-name="翡翠台" tvg-logo="https://epg.112114.xyz/logo/翡翠台.png" group-title="Hong Kong",翡翠台
+http://php.jdshipin.com/TVOD/iptv.php?id=huali2
+#EXTINF:-1 tvg-name="翡翠台" tvg-logo="https://epg.112114.xyz/logo/翡翠台.png" group-title="Hong Kong",翡翠台
 http://php.jdshipin.com:8880/TVOD/iptv.php?id=fct3
 #EXTINF:-1 tvg-name="翡翠台" tvg-logo="https://epg.112114.xyz/logo/翡翠台.png" group-title="Hong Kong",翡翠台
-http://php.jdshipin.com:8880/TVOD/iptv.php?id=fct4
-#EXTINF:-1 tvg-name="翡翠台" tvg-logo="https://epg.112114.xyz/logo/翡翠台.png" group-title="Hong Kong",翡翠台
-http://php.jdshipin.com:8880/TVOD/iptv.php?id=j1
+http://php.jdshipin.com:8880/TVOD/iptv.php?id=fct
 #EXTINF:-1 tvg-name="翡翠台" tvg-logo="https://epg.112114.xyz/logo/翡翠台.png" group-title="Hong Kong",翡翠台
 http://r.jdshipin.com/GeWKr
 #EXTINF:-1 tvg-name="無綫新聞台" tvg-logo="https://epg.112114.xyz/logo/無綫新聞台.png" group-title="Hong Kong",無綫新聞台
-https://rainews1-live.akamaized.net/hls/live/598326/rainews1/rainews1/playlist.m3u8
-#EXTINF:-1 tvg-name="無綫新聞台" tvg-logo="https://epg.112114.xyz/logo/無綫新聞台.png" group-title="Hong Kong",無綫新聞台
 https://cdn.haititivi.com/website/haitinews/index.m3u8
+#EXTINF:-1 tvg-name="無綫新聞台" tvg-logo="https://epg.112114.xyz/logo/無綫新聞台.png" group-title="Hong Kong",無綫新聞台
+https://rainews1-live.akamaized.net/hls/live/598326/rainews1/rainews1/playlist.m3u8
 #EXTINF:-1 tvg-name="無綫新聞台" tvg-logo="https://epg.112114.xyz/logo/無綫新聞台.png" group-title="Hong Kong",無綫新聞台
 https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV62.m3u8
 #EXTINF:-1 tvg-name="無綫新聞台" tvg-logo="https://epg.112114.xyz/logo/無綫新聞台.png" group-title="Hong Kong",無綫新聞台
@@ -599,9 +632,9 @@ https://live2.tensila.com/pearl-v-1.pearlfm/hls/live/mystream.m3u8
 #EXTINF:-1 tvg-name="TVB Plus" tvg-logo="https://epg.112114.xyz/logo/TVB Plus.png" group-title="Hong Kong",TVB Plus
 http://r.jdshipin.com/Nr5jq
 #EXTINF:-1 tvg-name="ViuTV" tvg-logo="https://epg.112114.xyz/logo/ViuTV.png" group-title="Hong Kong",ViuTV
-http://r.jdshipin.com/TcKr2
-#EXTINF:-1 tvg-name="ViuTV" tvg-logo="https://epg.112114.xyz/logo/ViuTV.png" group-title="Hong Kong",ViuTV
 http://r.jdshipin.com/vSJvl
+#EXTINF:-1 tvg-name="ViuTV" tvg-logo="https://epg.112114.xyz/logo/ViuTV.png" group-title="Hong Kong",ViuTV
+http://r.jdshipin.com/TcKr2
 #EXTINF:-1 tvg-name="ViuTV" tvg-logo="https://epg.112114.xyz/logo/ViuTV.png" group-title="Hong Kong",ViuTV
 http://php.jdshipin.com/TVOD/iptv.php?id=viutv2
 #EXTINF:-1 tvg-name="ViuTV" tvg-logo="https://epg.112114.xyz/logo/ViuTV.png" group-title="Hong Kong",ViuTV
@@ -623,13 +656,13 @@ http://php.jdshipin.com:8880/TVOD/iptv.php?id=rthk32
 #EXTINF:-1 tvg-name="港台電視32" tvg-logo="https://epg.112114.xyz/logo/港台電視32.png" group-title="Hong Kong",港台電視32
 http://rthktv32-live.akamaized.net/hls/live/2036819/RTHKTV32/master.m3u8
 #EXTINF:-1 tvg-name="有線新聞台" tvg-logo="https://epg.112114.xyz/logo/有線新聞台.png" group-title="Hong Kong",有線新聞台
-http://61.10.2.141:80/live_freedirect/freehd209_h.live/chunklist.m3u8
+http://61.10.2.140/live_freedirect/opentvhd002_h.live/playlist.m3u8
 #EXTINF:-1 tvg-name="有線新聞台" tvg-logo="https://epg.112114.xyz/logo/有線新聞台.png" group-title="Hong Kong",有線新聞台
-http://61.10.2.141/live_freedirect/freehd209_h.live/playlist.m3u
+http://61.10.2.140:80/live_freedirect/freehd209_h.live/chunklist_w135209556.m3u8
 #EXTINF:-1 tvg-name="有線新聞台" tvg-logo="https://epg.112114.xyz/logo/有線新聞台.png" group-title="Hong Kong",有線新聞台
-http://61.10.2.140/live_freedirect/freehd209_h.live/chunklist_w135209556.m3u8
+http://cm61-10-2-140.hkcable.com.hk/live_freedirect/freehd209_h.live/chunklist_w135209556.m3u8
 #EXTINF:-1 tvg-name="有線新聞台" tvg-logo="https://epg.112114.xyz/logo/有線新聞台.png" group-title="Hong Kong",有線新聞台
-http://cm61-10-2-143.hkcable.com.hk/live_freedirect/freehd209_h.live/playlist.m3u8
+http://61.10.2.141/live_freedirect/freehd209_h.live/playlist.m3u8
 
 ````
 
